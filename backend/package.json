@@ -1,0 +1,39 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Server and DB modules ",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sandroarobeli/places-app-mui.git"
+  },
+  "keywords": [
+    "Mongo",
+    "Express",
+    "Node",
+    "and",
+    "various",
+    "other",
+    "dependencies"
+  ],
+  "author": "Alex Arobelidze",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sandroarobeli/places-app-mui/issues"
+  },
+  "homepage": "https://github.com/sandroarobeli/places-app-mui#readme",
+  "dependencies": {
+    "@sendgrid/mail": "^7.6.0",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "mongoose": "^6.0.12"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.14"
+  }
+}
