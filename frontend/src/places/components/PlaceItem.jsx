@@ -129,9 +129,9 @@ const PlaceItem = (props) => {
             color='secondary'
             onClick={handleMapOpen}
             sx={{
-              marginRight: {
-                mobile: '0.5rem',
-                tablet: '1rem'
+              margin: {
+                mobile: '0.25rem',
+                tablet: '0.5rem'
               },
               color: 'secondary',
               "&:hover": {
@@ -149,8 +149,8 @@ const PlaceItem = (props) => {
             to={`/places/${props.id}`}
             sx={{
               margin: {
-                mobile: '0.5rem',
-                tablet: '1rem'
+                mobile: '0.25rem',
+                tablet: '0.5rem'
               },
               "&:hover": {
                 background: "#ff4382"
@@ -163,6 +163,10 @@ const PlaceItem = (props) => {
             variant='contained'
             onClick={handleDeleteModalOpen}
             sx={{
+              margin: {
+                mobile: '0.25rem',
+                tablet: '0.5rem'
+              },
               color: "white",
               background: "#830000",
               "&:hover": {
