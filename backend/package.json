@@ -28,10 +28,13 @@
   "homepage": "https://github.com/sandroarobeli/places-app-mui#readme",
   "dependencies": {
     "@sendgrid/mail": "^7.6.0",
+    "axios": "^0.24.0",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
-    "mongoose": "^6.0.12"
+    "express-validator": "^6.13.0",
+    "mongoose": "^6.0.12",
+    "mongoose-unique-validator": "^3.0.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.14"
