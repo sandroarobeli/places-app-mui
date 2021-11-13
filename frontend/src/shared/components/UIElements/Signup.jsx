@@ -1,5 +1,6 @@
 // Third party imports
-import React from "react";
+import React, { useState } from "react";
+import { useSelector, useDispatch } from 'react-redux'
 import { Formik, Form } from "formik";
 import { object, string } from "yup";
 import Grid from "@mui/material/Grid";
@@ -10,7 +11,8 @@ import LinearProgress from "@mui/material/LinearProgress";
 // Custom imports
 import TextField from './TextField'
 import Button from './Button'
-
+import ErrorModal from './ErrorModal'
+import { loginUser, logoutUser, selectLogin } from '../../../store/loginSlice'
 
 
 // ValidationSchema
@@ -25,6 +27,13 @@ const validationSchema = object({
 
 
 const Signup = (props) => {
+   // State management
+  const [openErrorModal, setOpenErrorModal] = useState(false)
+  const [backendError, setBackendError] = useState('')
+  
+   // From redux
+   const login = useSelector(selectLogin)
+   const dispatch = useDispatch()
     
   const initialFormState = {
     name: "",
@@ -34,15 +43,40 @@ const Signup = (props) => {
 
   // Handler functions
   // Submits data to the server
-  const submitHandler = (values, actions) => {
-    setTimeout(() => {
-      // setSubmitting not needed with async
-      actions.setSubmitting(false);
-      actions.resetForm(initialFormState);
-      console.log(values); // test
-    }, 2000)
+  const submitHandler = async (values, actions) => {
+    try {
+      const response = await fetch('http://127.0.0.1:5000/api/users/signup', {
+        method: 'POST',
+        headers: {
+          'Content-type': 'application/json',
+        },
+        mode: 'cors',
+        body: JSON.stringify({   // body has to be in JSON format!
+          name: values.name,
+          email: values.email,
+          password: values.password
+        })
+      })
+      const responseData = await response.json()
+      if (!response.ok) {
+        throw new Error(responseData.message)    
+      }
+      console.log(responseData)// test
+      actions.resetForm(initialFormState);  // actions.setSubmitting(false) not needed with async
+      dispatch(loginUser()) 
+    } catch (error) {
+      // errors ans setErrors for Formik have to do with frontend Form validation, not backend!
+      // Thats why backend errors are handled as a separate state variable here  
+      setBackendError(error.message)  
+    }
   }
-  
+   
+ 
+  // Closes Error Modal
+  const handleErrorModalClose = () => {
+    setOpenErrorModal(false)
+    setBackendError('')
+  }  
 
   return (
     <Formik
@@ -51,7 +85,7 @@ const Signup = (props) => {
       onSubmit={submitHandler}
     >
       {
-        ({ isSubmitting }) => (
+        ({ isSubmitting, errors }) => (
           <Form>
             <Grid container spacing={2}>
               <Grid item mobile={12}>
@@ -152,6 +186,12 @@ const Signup = (props) => {
                 </Button>
               </Grid>
             </Grid>
+            <ErrorModal
+              open={!!backendError}  // turns truthy error.message string into boolean
+              errorMessage={backendError}  // display backendError on ErrorModal
+              onClose={handleErrorModalClose}
+              clearModal={handleErrorModalClose}
+            />
           </Form>
         )
       }

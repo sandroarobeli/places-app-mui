@@ -22,7 +22,7 @@ router.post(
             .normalizeEmail() // toLowercase()
             .isEmail(),
         check('password')
-            .isLength({ min: 6 })
+            .isLength({ min: 8 })
     ], 
     usersControllers.signup
 )

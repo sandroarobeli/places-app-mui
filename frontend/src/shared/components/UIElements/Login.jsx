@@ -44,6 +44,7 @@ const Login = (props) => {
       actions.setSubmitting(false);
       actions.resetForm(initialFormState);
       console.log(values); // test
+      console.log(actions) // test
     }, 2000)
   }
   
@@ -144,4 +145,3 @@ const Login = (props) => {
 };
   
 export default Login;
-  
