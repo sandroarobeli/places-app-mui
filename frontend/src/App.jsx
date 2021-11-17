@@ -41,12 +41,12 @@ const theme = createTheme({
 
 const Main = (props) => {
   // From Redux
-  const login = useSelector(selectLogin)
+  const loggedIn = useSelector(selectLogin)
  
   
   // Locking down available routes depending on User's logged in/out status
   let routes
-  if (login.loggedIn) {
+  if (loggedIn) {
     routes = (
       <Switch>
         <Route path='/' exact>

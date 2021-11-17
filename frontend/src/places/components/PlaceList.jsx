@@ -22,18 +22,20 @@ const PlaceList = (props) => {
                     background: 'white'
                 }}
             >
-                <Typography variant='h4' component='h4'>No Places Found. Maybe Create One?</Typography>
-                <Button
-                    variant='contained'
-                    color='secondary'
-                    component={Link}
-                    to='/places/new'
-                    sx={{
-                        margin: "1rem"
-                    }}
-                >
-                    Share Place
-                </Button>
+                <Typography variant='h4' component='h4'>No Places Found</Typography>
+                {props.userId === props.loggedUser &&
+                    <Button
+                        variant='contained'
+                        color='secondary'
+                        component={Link}
+                        to='/places/new'
+                        sx={{
+                            margin: "1rem"
+                        }}
+                    >
+                        Share Place
+                    </Button>
+                }
             </CustomCard>
         )
     }
@@ -54,12 +56,13 @@ const PlaceList = (props) => {
                     <PlaceItem
                         key={place.id}
                         id={place.id}
-                        image={place.imageUrl}
+                        image={place.image}
                         title={place.title}
                         description={place.description}
                         address={place.address}
                         creatorId={place.creator}
                         coordinates={place.location}
+                        onDelete={props.onDelete}
                     />)
             }
         </Grid>

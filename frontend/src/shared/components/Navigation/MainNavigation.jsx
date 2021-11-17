@@ -12,7 +12,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 
 // Custom imports
 import SideDrawer from "./SideDrawer";
-import { logoutUser, selectLogin } from '../../../store/loginSlice'
+import { logoutUser, selectLogin, selectId } from '../../../store/loginSlice'
 
 
 
@@ -42,9 +42,10 @@ const LinkTab = props => {
 }
 
 
-const MainNavigation = (props) => {
+const MainNavigation = () => {
   // From Redux
-  const login = useSelector(selectLogin)
+  const loggedIn = useSelector(selectLogin)
+  const loggedUser = useSelector(selectId)
   const dispatch = useDispatch()
 
   // State management
@@ -115,10 +116,10 @@ const MainNavigation = (props) => {
             }}
           >
             <LinkTab label='all users' to='/' />
-            {login.loggedIn && <LinkTab label='my places' to='/u1/places' />}
-            {login.loggedIn && <LinkTab label='add place' to='/places/new' />}
-            {!login.loggedIn && <LinkTab label='authenticate' to='/authenticate' />}
-            {login.loggedIn && <LinkTab label='logout' to='/authenticate' onClick={handleLogout} />}
+            {loggedIn && <LinkTab label='my places' to={`/${loggedUser}/places`} />}
+            {loggedIn && <LinkTab label='add place' to='/places/new' />}
+            {!loggedIn && <LinkTab label='authenticate' to='/authenticate' />}
+            {loggedIn && <LinkTab label='logout' to='/authenticate' onClick={handleLogout} />}
           </Tabs>
           <SideDrawer
             open={drawerOpen}

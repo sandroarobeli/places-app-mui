@@ -1,44 +1,71 @@
 // Third party imports
-import React from "react";
-
+import React, { useEffect, useState } from "react";
+import { useSelector } from 'react-redux' 
 // Custom imports
 import UsersList from "../components/UsersList";
-
-
-// Temporary container for dummy data
-const USERS = [
-    {
-      id: "u1",
-      name: "Marillon Cotillard",
-      image:
-        "https://ca-times.brightspotcdn.com/dims4/default/3875161/2147483647/strip/true/crop/381x512+0+0/resize/840x1129!/quality/90/?url=https%3A%2F%2Fcalifornia-times-brightspot.s3.amazonaws.com%2Fde%2Faa%2F9fe6971fe714e7d9b79b5806a159%2Fsdut-file-in-this-may-21-2009-fil-20160829-002",
-      places: 3
-    },
-    {
-      id: "u2",
-      name: "Olga Kurylenko",
-      image:
-        "https://tr-images.condecdn.net/image/4lKNoX16pYJ/crop/405/f/olga-kurylenko-conde-nast-traveller-2april15-getty_.jpg",
-      places: 7
-    },
-    {
-      id: "u3",
-      name: "Diane Kruger",
-      image:
-        "https://m.media-amazon.com/images/M/MV5BMTM3MzY0Nzk2Ml5BMl5BanBnXkFtZTcwODQ0MTMyMw@@._V1_UY1200_CR93,0,630,1200_AL_.jpg",
-      places: 1
-  },
-  {
-    id: "u4",
-    name: "Jean Paul Belmondo",
-    image: "http://images6.fanpop.com/image/photos/36100000/Jean-Paul-Belmondo-image-jean-paul-belmondo-36169236-2351-2922.jpg",
-    places: 69
-    }
-];
+import ErrorModal from '../../shared/components/UIElements/ErrorModal'
+import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner'
+import { selectId } from '../../store/loginSlice'   
 
 const Users = () => {
+  // State management
+  const [openErrorModal, setOpenErrorModal] = useState(false)
+  const [backendError, setBackendError] = useState('')
+  const [isLoading, setIsLoading] = useState(false) // Redux will handle this if used
+  const [loadedUsers, setLoadedUsers] = useState([])
+
+  // From Redux
+  const loggedUser = useSelector(selectId)
+
+  useEffect(() => {
+    const sendRequest = async () => {
+      setIsLoading(true)
+      try {
+        const response = await fetch('http://127.0.0.1:5000/api/users/')
+        const responseData = await response.json()
+        if (!response.ok) {
+          throw new Error(responseData.message)    
+        }
+        console.log('Current users ID: ')
+        console.log(loggedUser) // test reads from response
+        console.log(responseData.users)
+        setIsLoading(false)
+        setLoadedUsers(responseData.users)
+      } catch (error) {
+        setIsLoading(false)
+        setBackendError(error.message)
+      }
+    }
+
+    sendRequest()
+    
+  }, [])
+
+  // Handler functions
+  // Closes Error Modal
+  const handleErrorModalClose = () => {
+    setOpenErrorModal(false)
+    setBackendError('')
+  } 
+
   return (
-      <UsersList items={USERS} />
+    <React.Fragment>
+      {isLoading &&
+        <LoadingSpinner
+        text='Loading Users...'
+        size='10rem'
+        thickness={4.5}
+        color="#f8df00"
+      />
+      }
+      <UsersList items={loadedUsers} />
+      <ErrorModal
+        open={!!backendError}  // turns truthy error.message string into boolean
+        errorMessage={backendError}  // display backendError on ErrorModal
+        onClose={handleErrorModalClose}
+        clearModal={handleErrorModalClose}
+      />
+    </React.Fragment>
     );
 };
   

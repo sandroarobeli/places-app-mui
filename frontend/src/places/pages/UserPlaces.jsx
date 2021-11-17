@@ -1,63 +1,79 @@
 // Third party imports
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useSelector } from 'react-redux'
 import { useParams } from "react-router-dom";
 
 
 // Custom imports
 import PlaceList from "../components/PlaceList";
+import ErrorModal from '../../shared/components/UIElements/ErrorModal'
+import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner'
+import { selectId } from '../../store/loginSlice'
 
+const UserPlaces = () => {
+  // From redux
+  const loggedUser = useSelector(selectId)
+  
+  // Access to the dynamic segments
+  const userId = useParams().userId;
+  // State management
+  const [openErrorModal, setOpenErrorModal] = useState(false)
+  const [userPlaces, setUserPlaces] = useState([])
+  const [backendError, setBackendError] = useState('')
+  const [isLoading, setIsLoading] = useState(false) // Redux will handle this if used
 
-// Temporary container for dummy data
-const PLACES = [
-    {
-      id: "p1",
-      title: "Empire state building",
-      description: "One of the most skyscrapers in the world",
-      imageUrl:
-        "https://media.istockphoto.com/photos/new-york-city-skyline-picture-id486334510?k=6&m=486334510&s=612x612&w=0&h=qMsSuzsZcCtSEZyhnEsJsQvRSx-feldCQAOR9D9mVas=",
-      address: "20 W 34th St, New York, NY 10001",
-      creator: "u1",
-      location: {
-        lat: 40.7484,
-        lng: -73.9857
-      }
-    },
-    {
-      id: "p2",
-      title: "Leaning tower of Pisa",
-      description: "Leaning tower structure in the city of Pisa,Italy",
-      imageUrl:
-        "https://cdn.britannica.com/88/80588-050-8D944BFE/Leaning-Tower-of-Pisa-Italy.jpg",
-      address: "Piazza del Duomo, 56126 Pisa PI, Italy",
-      creator: "u1",
-      location: {
-        lat: 43.723,
-        lng: 10.3966
-      }
-    },
-    {
-      id: "p3",
-      title: "Le Louvre",
-      description: "The Louvre museum in Paris, France",
-      imageUrl:
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Louvre_Courtyard%2C_Looking_West.jpg/805px-Louvre_Courtyard%2C_Looking_West.jpg",
-      address: "Rue de Rivoli, 75001 Paris, France",
-      creator: "u2",
-      location: {
-        lat: 48.8606,
-        lng: 2.3376
-      }
+  useEffect(() => {
+    const sendRequest = async () => {
+      setIsLoading(true)
+      try {
+        const response = await fetch(`http://127.0.0.1:5000/api/places/user/${userId}`)
+        const responseData = await response.json()
+        if (!response.ok) {
+          throw new Error(responseData.message)    
+        }
+        console.log(responseData.places) //test
+        setIsLoading(false)
+        setUserPlaces(responseData.places)
+      } catch (error) {
+        setIsLoading(false)
+        setBackendError(error.message)
+     }
     }
-];
-  
-const UserPlaces = (props) => {
-    // Access to the dynamic segments
-    const userId = useParams().userId;
-  
-    const uploadedPlaces = PLACES.filter((place) => place.creator === userId);
     
+    sendRequest()
+  }, [userId])
+
+  // Handler functions
+  // Closes Error Modal
+  const handleErrorModalClose = () => {
+    setOpenErrorModal(false)
+    setBackendError('')
+  }
+  
+  // Triggers re rendering so the list no longer shows deleted place
+  const placeDeleteHandler = (deletedPlaceId) => {
+    setUserPlaces(prevState => prevState.filter((place) => place.id !== deletedPlaceId))
+  }
+  
   return (
-    <PlaceList items={uploadedPlaces} />
+    <React.Fragment>
+      {isLoading &&
+        <LoadingSpinner
+          text='Loading Places...'
+          size='10rem'
+          thickness={4.5}
+          color="#f8df00"
+        />
+      }
+      <PlaceList items={userPlaces} userId={userId} loggedUser={loggedUser} onDelete={placeDeleteHandler} />
+      <ErrorModal
+        open={!!backendError}  // turns truthy error.message string into boolean
+        errorMessage={backendError}  // display backendError on ErrorModal
+        onClose={handleErrorModalClose}
+        clearModal={handleErrorModalClose}
+      />
+    </React.Fragment>
+    
     );
   };
   

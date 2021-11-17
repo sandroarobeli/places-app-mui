@@ -1,5 +1,7 @@
 // Third party imports
 import React, { useState } from "react";
+import { useHistory } from "react-router-dom";
+import { useSelector } from 'react-redux'
 import { Formik, Form } from "formik";
 import { object, string } from "yup";
 import Grid from "@mui/material/Grid";
@@ -11,7 +13,8 @@ import LinearProgress from "@mui/material/LinearProgress";
 import TextField from '../../shared/components/UIElements/TextField'
 import Button from '../../shared/components/UIElements/Button'
 import Snackbar from '../../shared/components/UIElements/Snackbar'
-
+import ErrorModal from '../../shared/components/UIElements/ErrorModal'
+import { selectId } from '../../store/loginSlice'
 
 // ValidationSchema
 const validationSchema = object({
@@ -24,32 +27,68 @@ const validationSchema = object({
 
 
 const NewPlace = () => {
+    // State management
     const [openSnackbar, setOpenSnackbar] = useState(false)
+    const [openErrorModal, setOpenErrorModal] = useState(false)
+    const [backendError, setBackendError] = useState('')
+
+    // From Redux
+    const loggedUser = useSelector(selectId)
+
+    const history = useHistory()
 
     const initialFormState = {
         title: "",
         description: "",
         address: ""
     }
-    
+    console.log(loggedUser) // test
     // Handler functions
     // Submits data to the server
-    const submitHandler = (values, actions) => {
-        setTimeout(() => {
-            // setSubmitting not needed with async
-            actions.setSubmitting(false);
-            actions.resetForm(initialFormState);
+    const submitHandler = async (values, actions) => {
+        try {
+            const response = await fetch('http://127.0.0.1:5000/api/places/', {
+                method: 'POST',
+                headers: {
+                    'Content-type': 'application/json',
+                },
+                mode: 'cors',
+                body: JSON.stringify({    // body has to be in JSON format!
+                    title: values.title,
+                    description: values.description,
+                    address: values.address,
+                    creator: loggedUser
+                })
+            })
+            const responseData = await response.json()
+            if (!response.ok) {
+                throw new Error(responseData.message)    
+            }
+            console.log(responseData)
             setOpenSnackbar(true);
-            console.log(values); // test
-        }, 2000)
+            actions.resetForm(initialFormState);  // actions.setSubmitting(false) not needed with async
+            history.push('/')
+        } catch (error) {
+            // errors ans setErrors for Formik have to do with frontend Form validation, not backend!
+            // Thats why backend errors are handled as a separate state variable here  
+            setBackendError(error.message)
+        }
     }
+
+
     // Manages snackbar
-    const handleClose = (event, reason) => {
+    const handleSnackbarClose = (event, reason) => {
         if (reason === "clickaway") {
             return
         }
         setOpenSnackbar(false)
     }
+
+    // Closes Error Modal
+    const handleErrorModalClose = () => {
+        setOpenErrorModal(false)
+        setBackendError('')
+    }  
 
     return (
         <Container
@@ -160,7 +199,7 @@ const NewPlace = () => {
                                 <Grid item mobile={12}>
                                     <Snackbar
                                         open={openSnackbar}
-                                        onClose={handleClose}
+                                        onClose={handleSnackbarClose}
                                         sx={{
                                             width: {
                                                 mobile: '80%',
@@ -174,6 +213,12 @@ const NewPlace = () => {
                                     </Snackbar>
                                 </Grid>
                             </Grid>
+                            <ErrorModal
+                                open={!!backendError}  // turns truthy error.message string into boolean
+                                errorMessage={backendError}  // display backendError on ErrorModal
+                                onClose={handleErrorModalClose}
+                                clearModal={handleErrorModalClose}
+                            />
                         </Form>
                     )
                 }

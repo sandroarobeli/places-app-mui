@@ -20,11 +20,11 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
 // Register individual custom routers
-app.use('/api/places', placesRoutes) 
-app.use('/api/users', usersRoutes)
+app.use('/api/places', placesRoutes) // This url triggers placesRoutes
+app.use('/api/users', usersRoutes) // This url triggers userRoutes
 
 // Handling errors for unsupported routes
-app.use((req, res, next) => {
+app.use((req, res, next) => {     // After urls above, all else triggers error (because there is not url but app.use --> works for every url) 
     const error = new HttpError('Route not found', 404)
     throw error // Since this is synchronous, we can use throw format
 })

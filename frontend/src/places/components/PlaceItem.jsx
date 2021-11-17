@@ -14,17 +14,24 @@ import Grid from "@mui/material/Grid";
 // Custom imports
 import MapModal from "../../shared/components/UIElements/MapModal";
 import DeleteModal from "../../shared/components/UIElements/DeleteModal";
-import { selectLogin } from '../../store/loginSlice'
+import Snackbar from '../../shared/components/UIElements/Snackbar'
+import ErrorModal from '../../shared/components/UIElements/ErrorModal'
+import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner'
+import { selectId } from '../../store/loginSlice'
 
 
 
 const PlaceItem = (props) => {
   // From Redux
-  const login = useSelector(selectLogin)
+  const loggedUser = useSelector(selectId)
 
   // State management module
   const [openMap, setOpenMap] = useState(false)
   const [openDeleteModal, setOpenDeleteModal] = useState(false)
+  const [openErrorModal, setOpenErrorModal] = useState(false)
+  const [openSnackbar, setOpenSnackbar] = useState(false)
+  const [backendError, setBackendError] = useState('')
+  const [isLoadingSpinner, setIsLoadingSpinner] = useState(false) // Redux will handle this if used
 
   // Handler functions
   const handleMapOpen = () => {
@@ -42,10 +49,39 @@ const PlaceItem = (props) => {
   const handleDeleteModalClose = () => {
     setOpenDeleteModal(false)
   }
+  // Manages snackbar
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+        return
+    }
+    setOpenSnackbar(false)
+  }
+  // Closes Error Modal
+  const handleErrorModalClose = () => {
+    setOpenErrorModal(false)
+    setBackendError('')
+  }
 
-  const handleDelete = () => {
-    console.log(`${props.title} has been deleted!`); //test
+  const handleDelete = async () => {
     setOpenDeleteModal(false);
+    setIsLoadingSpinner(true)
+    try {
+      const response = await fetch(`http://127.0.0.1:5000/api/places/${props.id}`, {
+        method: 'DELETE',
+        mode: 'cors',
+      })
+      const responseData = await response.json()
+      if (!response.ok) {
+        throw new Error(responseData.message)    
+      }
+      console.log(`${props.title} has been deleted!`); //test
+      setIsLoadingSpinner(false)
+      props.onDelete(props.id)
+      setOpenSnackbar(true);
+    } catch (error) {
+      setIsLoadingSpinner(false)
+      setBackendError(error.message)
+    }
   }
 
   return (
@@ -68,6 +104,14 @@ const PlaceItem = (props) => {
           backgroundColor: 'white'
         }}
       >
+        {isLoadingSpinner &&
+          <LoadingSpinner
+            text='Loading Place...'
+            size='10rem'
+            thickness={4.5}
+            color="#f8df00"
+          />
+        }
         <CardActionArea>
           <CardMedia
             image={props.image}
@@ -142,7 +186,7 @@ const PlaceItem = (props) => {
           >
             View on map
           </Button>
-          {login.loggedIn && <Button
+          {loggedUser === props.creatorId && <Button
             variant='contained'
             color='secondary'
             component={Link}
@@ -159,7 +203,7 @@ const PlaceItem = (props) => {
           >
             Edit
           </Button>}
-          {login.loggedIn && <Button
+          {loggedUser === props.creatorId && <Button
             variant='contained'
             onClick={handleDeleteModalOpen}
             sx={{
@@ -190,8 +234,28 @@ const PlaceItem = (props) => {
         cancelDelete={handleDeleteModalClose}
         confirmDelete={handleDelete}
       />
+      <Snackbar
+        open={openSnackbar}
+        onClose={handleClose}
+        sx={{
+          width: {
+            mobile: '80%',
+            tablet: '30%',
+            laptop: '25%'
+          },
+          backgroundColor: '#ff4382'
+        }}
+      >
+        Place deleted!
+      </Snackbar>
+      <ErrorModal
+        open={!!backendError}  // turns truthy error.message string into boolean
+        errorMessage={backendError}  // display backendError on ErrorModal
+        onClose={handleErrorModalClose}
+        clearModal={handleErrorModalClose}
+      />
     </Grid>
-    )
+  )
 };
   
   export default PlaceItem;

@@ -12,7 +12,7 @@ import LinearProgress from "@mui/material/LinearProgress";
 import TextField from './TextField'
 import Button from './Button'
 import ErrorModal from './ErrorModal'
-import { loginUser, logoutUser, selectLogin } from '../../../store/loginSlice'
+import { loginUser, selectLogin, selectId } from '../../../store/loginSlice'
 
 
 // ValidationSchema
@@ -27,13 +27,13 @@ const validationSchema = object({
 
 
 const Signup = (props) => {
-   // State management
+  // State management
   const [openErrorModal, setOpenErrorModal] = useState(false)
   const [backendError, setBackendError] = useState('')
   
-   // From redux
-   const login = useSelector(selectLogin)
-   const dispatch = useDispatch()
+  // From redux
+  const loggedUser = useSelector(selectId)
+  const dispatch = useDispatch()
     
   const initialFormState = {
     name: "",
@@ -61,9 +61,10 @@ const Signup = (props) => {
       if (!response.ok) {
         throw new Error(responseData.message)    
       }
-      console.log(responseData)// test
+      console.log(responseData.user.id)// test
       actions.resetForm(initialFormState);  // actions.setSubmitting(false) not needed with async
-      dispatch(loginUser()) 
+      dispatch(loginUser(responseData.user.id))
+      console.log(loggedUser)//test
     } catch (error) {
       // errors ans setErrors for Formik have to do with frontend Form validation, not backend!
       // Thats why backend errors are handled as a separate state variable here  

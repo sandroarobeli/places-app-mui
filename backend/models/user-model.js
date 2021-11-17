@@ -38,7 +38,7 @@ const userSchema = new mongoose.Schema({
 })
 
 // Ensures no two users are created with the same email. Also, speeds up querying
-userSchema.plugin(uniqueValidator)
+// userSchema.plugin(uniqueValidator) // INVESTIGATE LATER, CAUSES PROBLEMS
 
 // Delete all user places when user is removed (Requires ES-5 function, Needs THIS binding)
 userSchema.pre('remove', async function (next) {

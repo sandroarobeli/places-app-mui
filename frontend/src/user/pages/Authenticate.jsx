@@ -7,7 +7,7 @@ import Button from '@mui/material/Button'
 import Login from '../../shared/components/UIElements/Login'
 import Signup from "../../shared/components/UIElements/Signup";
 
-const Authenticate = (props) => {
+const Authenticate = () => {
     // State management module
     const [loginMode, setLoginMode] = useState(true)
 

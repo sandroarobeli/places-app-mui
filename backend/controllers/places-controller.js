@@ -16,7 +16,7 @@ const getPlaceById  = async (req, res, next) => {
         if (!place) {
             // IN SYNCHRONOUS MODE USE next(error) OR throw new Error('some generic message'),
             // IN A-SYNCHRONOUS MODE ONLY USE return next(error)
-            return next(new HttpError(`Place with ID: ${placeId} not found`, 404))
+            return next(new HttpError(`Place not found`, 404))
         }
         // adds id property (in addition to _id) to the returned Object
         res.status(200).json({ place: place.toObject({ getters: true }) }) 
@@ -90,12 +90,12 @@ const createPlace = async (req, res, next) => {
     const createdPlace = new Place({
         title,
         description,
-        image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1c/ba/d8/83/exterior.jpg?w=900&h=-1&s=1",
+        image: "https://cdn.britannica.com/88/80588-050-8D944BFE/Leaning-Tower-of-Pisa-Italy.jpg",
         address,
         location: coordinates,
-        creator
+        creator: creator     // test for now, DELETE later  '618febb96a54e02a79e6bfb8' 
     })
-
+    console.log(creator) // test
     // This block ensures that only existing user can create a new place
     let user
     try {

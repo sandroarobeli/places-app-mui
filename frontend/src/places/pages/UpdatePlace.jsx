@@ -1,6 +1,7 @@
 // Third party imports
-import React, { useState } from 'react'
-import { useParams } from 'react-router-dom'
+import React, { useState, useEffect } from 'react'
+import { useParams, useHistory } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import { Formik, Form } from "formik"
 import { object, string } from "yup";
 import Typography from '@mui/material/Typography'
@@ -9,10 +10,12 @@ import Container from "@mui/material/Container";
 import LinearProgress from "@mui/material/LinearProgress";
 
 // Custom imports
-import CustomCard from "../../shared/components/UIElements/CustomCard";
 import TextField from '../../shared/components/UIElements/TextField'
 import Button from '../../shared/components/UIElements/Button'
 import Snackbar from '../../shared/components/UIElements/Snackbar'
+import ErrorModal from '../../shared/components/UIElements/ErrorModal'
+import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner'
+import { selectId } from '../../store/loginSlice'
 
 // ValidationSchema
 const validationSchema = object({
@@ -23,87 +26,77 @@ const validationSchema = object({
 });
 
 
-
-// Temporary container for dummy data
-const PLACES = [
-    {
-      id: "p1",
-      title: "Empire state building",
-      description: "One of the most skyscrapers in the world",
-      imageUrl:
-        "https://media.istockphoto.com/photos/new-york-city-skyline-picture-id486334510?k=6&m=486334510&s=612x612&w=0&h=qMsSuzsZcCtSEZyhnEsJsQvRSx-feldCQAOR9D9mVas=",
-      address: "20 W 34th St, New York, NY 10001",
-      creator: "u1",
-      location: {
-        lat: 40.7484,
-        lng: -73.9857
-      }
-    },
-    {
-      id: "p2",
-      title: "Leaning tower of Pisa",
-      description: "Leaning tower structure in the city of Pisa,Italy",
-      imageUrl:
-        "https://cdn.britannica.com/88/80588-050-8D944BFE/Leaning-Tower-of-Pisa-Italy.jpg",
-      address: "Piazza del Duomo, 56126 Pisa PI, Italy",
-      creator: "u1",
-      location: {
-        lat: 43.723,
-        lng: 10.3966
-      }
-    },
-    {
-      id: "p3",
-      title: "Le Louvre",
-      description: "The Louvre museum in Paris, France",
-      imageUrl:
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Louvre_Courtyard%2C_Looking_West.jpg/805px-Louvre_Courtyard%2C_Looking_West.jpg",
-      address: "Rue de Rivoli, 75001 Paris, France",
-      creator: "u2",
-      location: {
-        lat: 48.8606,
-        lng: 2.3376
-      }
-    }
-  ];
-
-
-const UpdatePlace = (props) => {
+const UpdatePlace = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false)
-
+  const [openErrorModal, setOpenErrorModal] = useState(false)
+  const [backendError, setBackendError] = useState('')
+  const [isLoadingSpinner, setIsLoadingSpinner] = useState(false) // Redux will handle this if used
+  const [initialFormState, setInitialFormState] = useState({ title: '', description: '', address: ''})
+  
   // Access to the dynamic segments
   const placeId = useParams().placeId;
   
-  // Forthcoming server call goes here
-  const identifiedPlace = PLACES.find((place) => place.id === placeId);
-  
-  // To avoid undefined results when non-existent placeId somehow gets generated
-  const initialFormState =
-    !identifiedPlace ?
-      {
-        title: '',
-        description: '',
-        address: ''
-      }
-      :
-      {
-        title: identifiedPlace.title,
-        description: identifiedPlace.description,
-        address: identifiedPlace.address
-      }
-   
+  // From Redux
+  const loggedUser = useSelector(selectId)
 
+  // History module
+  const history = useHistory()
+  
+  // Pre-loads title, description and address of the place to be edited
+  useEffect(() => {
+    const sendRequest = async () => {
+      setIsLoadingSpinner(true)
+      try {
+        const response = await fetch(`http://127.0.0.1:5000/api/places/${placeId}`)
+        const responseData = await response.json()
+        if (!response.ok) {
+          throw new Error(responseData.message)    
+        }
+        console.log(responseData.place) //test
+        setIsLoadingSpinner(false)
+        setInitialFormState({ title: responseData.place.title, description: responseData.place.description, address: responseData.place.address })
+      } catch (error) {
+        setIsLoadingSpinner(false)
+        setBackendError(error.message)
+      }
+    }
+
+    sendRequest()
+  },[placeId])
+  
+  
   // Handler functions
   // Submits data to the server
-  const submitHandler = (values, actions) => {
-      setTimeout(() => {
-        // setSubmitting not needed with async
-        actions.setSubmitting(false);
-        actions.resetForm(initialFormState);
-        setOpenSnackbar(true);
-        console.log(values); // test
-    }, 2000)
+  const submitHandler = async (values, actions) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:5000/api/places/${placeId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-type': 'application/json',
+        },
+        mode: 'cors',
+        body: JSON.stringify({
+          title: values.title,
+          description: values.description
+        })
+      })
+      const responseData = await response.json()
+      if (!response.ok) {
+        throw new Error(responseData.message)    
+      }
+      console.log(responseData)
+      setOpenSnackbar(true);
+     // setInitialFormState({ title: '', description: '', address: ''})
+      //actions.resetForm(initialFormState);  // actions.setSubmitting(false) not needed with async
+      history.push(`/${loggedUser}/places`)
+    } catch (error) {
+       // errors ans setErrors for Formik have to do with frontend Form validation, not backend!
+       // Thats why backend errors are handled as a separate state variable here  
+       setBackendError(error.message)
+    }
   }
+  
+  
   // Manages snackbar
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -112,27 +105,12 @@ const UpdatePlace = (props) => {
     setOpenSnackbar(false)
   }
   
-  if (!identifiedPlace) {
-    return (
-      <CustomCard
-        sx={{
-          margin: '3rem auto',
-          padding: '1rem 4rem',
-          textAlign: 'center',
-          maxWidth: '375px',
-          background: 'white'
-        }}
-      >
-        <Typography
-          variant='h4'
-          component='h4'
-        >
-          Place could not be found.
-        </Typography>
-      </CustomCard>
-    )    
+  // Closes Error Modal
+  const handleErrorModalClose = () => {
+    setOpenErrorModal(false)
+    setBackendError('')
   }
-    
+  
   return (
     <Container
       sx={{
@@ -150,10 +128,19 @@ const UpdatePlace = (props) => {
         textAlign: "center"
       }}
     >
+      {isLoadingSpinner &&
+        <LoadingSpinner
+          text='Loading Place...'
+          size='10rem'
+          thickness={4.5}
+          color="#f8df00"
+        />
+      }
       <Formik
         initialValues={initialFormState}
         validationSchema={validationSchema}
         onSubmit={submitHandler}
+        enableReinitialize // allows pre-populating textFields upon component load 
       >
         {
           ({ isSubmitting }) => (
@@ -256,6 +243,12 @@ const UpdatePlace = (props) => {
                   </Snackbar>
                 </Grid>
               </Grid>
+              <ErrorModal
+                open={!!backendError}  // turns truthy error.message string into boolean
+                errorMessage={backendError}  // display backendError on ErrorModal
+                onClose={handleErrorModalClose}
+                clearModal={handleErrorModalClose}
+              />
             </Form>
           )
         }
