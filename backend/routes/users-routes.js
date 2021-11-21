@@ -4,6 +4,7 @@ const { check } = require('express-validator')
 
 // Custom modules
 const usersControllers = require('../controllers/users-controller')
+const fileUpload = require('../middleware/file-upload')
 
 // Initializing the router object
 const router = express.Router()
@@ -13,7 +14,8 @@ router.get('/', usersControllers.getUsers)
 
 // Signup a new user
 router.post(
-    '/signup', 
+    '/signup',
+    fileUpload.single('image'),
     [
         check('name')
             .not()

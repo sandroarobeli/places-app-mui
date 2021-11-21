@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from 'react-redux'
 import { Formik, Form } from "formik";
-import { object, string } from "yup";
+import { object, string, mixed } from "yup";
 import Grid from "@mui/material/Grid";
 import Divider from '@mui/material/Divider';
 import Typography from "@mui/material/Typography";
@@ -12,6 +12,7 @@ import LinearProgress from "@mui/material/LinearProgress";
 import TextField from './TextField'
 import Button from './Button'
 import ErrorModal from './ErrorModal'
+import ImageUpload from './ImageUpload'
 import { loginUser, selectLogin, selectId } from '../../../store/loginSlice'
 
 
@@ -22,7 +23,9 @@ const validationSchema = object({
     password: string()
       .min(8, "Password must contain at least 8 characters")
       .matches(/^(?:(?!password).)*$/gi, "Cannot contain the word 'password'")
-      .required("Enter a valid password")
+      .required("Enter a valid password"),
+    image: mixed().required()
+     
 });
 
 
@@ -38,33 +41,34 @@ const Signup = (props) => {
   const initialFormState = {
     name: "",
     email: "",
-    password: ""
+    password: "",
+    image: null
   }
 
   // Handler functions
   // Submits data to the server
   const submitHandler = async (values, actions) => {
     try {
+      let formData = new FormData()
+      // Binary data inputs (values)
+      formData.append('name', values.name) 
+      formData.append('email', values.email)
+      formData.append('password', values.password)
+      formData.append('image', values.image) 
+      // JSON data inputs (values)
       const response = await fetch('http://127.0.0.1:5000/api/users/signup', {
         method: 'POST',
-        headers: {
-          'Content-type': 'application/json',
-        },
-        mode: 'cors',
-        body: JSON.stringify({   // body has to be in JSON format!
-          name: values.name,
-          email: values.email,
-          password: values.password
-        })
+        body: formData
       })
       const responseData = await response.json()
       if (!response.ok) {
         throw new Error(responseData.message)    
       }
       console.log(responseData.user.id)// test
+      console.log('ResponseData:') // testing ImageUpload
+      console.log(responseData)
       actions.resetForm(initialFormState);  // actions.setSubmitting(false) not needed with async
       dispatch(loginUser(responseData.user.id))
-      console.log(loggedUser)//test
     } catch (error) {
       // errors ans setErrors for Formik have to do with frontend Form validation, not backend!
       // Thats why backend errors are handled as a separate state variable here  
@@ -86,7 +90,7 @@ const Signup = (props) => {
       onSubmit={submitHandler}
     >
       {
-        ({ isSubmitting, errors }) => (
+        (formProps) => (
           <Form>
             <Grid container spacing={2}>
               <Grid item mobile={12}>
@@ -123,6 +127,14 @@ const Signup = (props) => {
                   name='name'
                   label='Name'
                   type='text'
+                />
+              </Grid>
+              <Grid item mobile={12}>
+                <ImageUpload
+                  image={formProps.values.image} 
+                  handleImageUpload={(event) => {
+                    formProps.setFieldValue("image", event.target.files[0]);
+                  }}
                 />
               </Grid>
               <Grid item mobile={12}>
@@ -166,7 +178,7 @@ const Signup = (props) => {
                 />
               </Grid>
               {
-                isSubmitting && (
+                formProps.isSubmitting && (
                     <Grid item mobile={12}>
                         <LinearProgress />
                     </Grid>

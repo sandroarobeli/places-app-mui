@@ -1,5 +1,6 @@
 // Third party modules
 const { validationResult } = require('express-validator')
+const fs = require('fs')
 
 // Custom modules
 const HttpError = require('../models/http-error')
@@ -25,12 +26,14 @@ const signup = async (req, res, next) => {
     // If returned errors object isn't empty, error is passed down the chain via next() 
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
+        console.log('BACKEND ERRORS:')
         console.log(errors.errors)//test
         return next(new HttpError('Invalid inputs entered. Please check your data', 422)) 
     }
 
     // Getting manually entered properties from the user request
     const { name, email, password } = req.body
+
     try {
         const existingUser = await User.findOne({ email })
         if (existingUser) {
@@ -45,11 +48,22 @@ const signup = async (req, res, next) => {
         name,
         email,
         password,
-        image: 'https://media.gettyimages.com/photos/frenchiranian-actress-golshifteh-farahani-arrives-for-the-screening-picture-id1143817089',
+        image: req.file.path +  '.' + req.file.mimetype.match(/\/([\s\S]*)$/)[1], // attaches extension 
         places: []
     })
     // THIS TRY-CATCH ENSURES PROPER NETWORK PROTOCOL EXCHANGE
     try {
+        console.log('created User:')
+        console.log(createdUser)
+        console.log('req.file')
+        console.log(req.file)
+        // Change image name in uploads/images dir to exactly how I create it in database!!!.
+        fs.rename(req.file.path, req.file.path + '.' + req.file.mimetype.match(/\/([\s\S]*)$/)[1], (error) => {
+            if (error) {
+                throw error;    
+            }
+            console.log('Renaming complete!');
+        })
         await createdUser.save()
         // Send Welcome email (DOESN'T NEED ASYNC AWAIT, WHEN A USER GETS IT IS NOT IMPORTANT)
         templateEmails.sendWelcomeEmail(name, email)        
