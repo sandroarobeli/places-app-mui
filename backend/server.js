@@ -1,4 +1,6 @@
 // Third party imports
+const fs = require('fs')
+const path = require('path')
 const express = require('express')
 const cors = require('cors')
 
@@ -19,6 +21,11 @@ app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
+// Middleware that adds ability to process requests for images
+// general (app.use() type) middleware. 
+// Static serving just return a file without executing anything 
+app.use('/uploads/images', express.static(path.join('uploads', 'images')))
+
 // Register individual custom routers
 app.use('/api/places', placesRoutes) // This url triggers placesRoutes
 app.use('/api/users', usersRoutes) // This url triggers userRoutes
@@ -30,11 +37,17 @@ app.use((req, res, next) => {     // After urls above, all else triggers error (
 })
 
 
-// Register error handling middleware
+// Register error handling middleware (GENERAL ERROR HANDLER. WHEREVER THE ERRORS MAY ORIGINATE)
 // If middleware function has 4 parameters, express will recognize it as a special 
 // ERROR handling middleware meaning it will only be executed
 // On requests that throw (contain) errors
 app.use((error, req, res, next) => {
+    // If there is a validation error, image file creation will be rolled back
+    if (req.file) { // if there is an error, and file got created, we needn't that useless file 
+        fs.unlink(req.file.path, (error) => {
+            console.log(error)
+        }) // deletes the image file
+    }
     // if response has been sent
     if (res.headerSent) {
         return next(error)

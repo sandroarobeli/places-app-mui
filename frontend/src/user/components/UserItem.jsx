@@ -40,7 +40,7 @@ const UserItem = (props) => {
            component={
              () =>
                <Avatar
-                 src={props.image}
+                 src={`http://127.0.0.1:5000/${props.image}`}  //{props.image}
                  alt={props.name}
                  sx={{width: '6rem', height: '6rem', margin: 'auto 5px'}}
                />
