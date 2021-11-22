@@ -13,7 +13,7 @@ import TextField from './TextField'
 import Button from './Button'
 import ErrorModal from './ErrorModal'
 import ImageUpload from './ImageUpload'
-import { loginUser, selectLogin, selectId } from '../../../store/loginSlice'
+import { loginUser, selectId } from '../../../store/loginSlice'
 
 
 // ValidationSchema
@@ -50,12 +50,12 @@ const Signup = (props) => {
   const submitHandler = async (values, actions) => {
     try {
       let formData = new FormData()
-      // Binary data inputs (values)
+      //  Data inputs via formData (values)
       formData.append('name', values.name) 
       formData.append('email', values.email)
       formData.append('password', values.password)
       formData.append('image', values.image) 
-      // JSON data inputs (values)
+      // Data inputs using formData (values)
       const response = await fetch('http://127.0.0.1:5000/api/users/signup', {
         method: 'POST',
         body: formData
@@ -64,7 +64,6 @@ const Signup = (props) => {
       if (!response.ok) {
         throw new Error(responseData.message)    
       }
-      console.log(responseData.user.id)// test
       console.log('ResponseData:') // testing ImageUpload
       console.log(responseData)
       actions.resetForm(initialFormState);  // actions.setSubmitting(false) not needed with async
@@ -131,7 +130,9 @@ const Signup = (props) => {
               </Grid>
               <Grid item mobile={12}>
                 <ImageUpload
-                  image={formProps.values.image} 
+                  image={formProps.values.image}
+                  width='150px'
+                  height='150px'
                   handleImageUpload={(event) => {
                     formProps.setFieldValue("image", event.target.files[0]);
                   }}

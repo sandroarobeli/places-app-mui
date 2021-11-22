@@ -53,10 +53,8 @@ const signup = async (req, res, next) => {
     })
     // THIS TRY-CATCH ENSURES PROPER NETWORK PROTOCOL EXCHANGE
     try {
-        console.log('created User:')
-        console.log(createdUser)
-        console.log('req.file')
-        console.log(req.file)
+        console.log('req.file') // test
+        console.log(req.file) // test
         // Change image name in uploads/images dir to exactly how I create it in database!!!.
         fs.rename(req.file.path, req.file.path + '.' + req.file.mimetype.match(/\/([\s\S]*)$/)[1], (error) => {
             if (error) {

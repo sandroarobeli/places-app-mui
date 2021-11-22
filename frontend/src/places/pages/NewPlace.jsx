@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useSelector } from 'react-redux'
 import { Formik, Form } from "formik";
-import { object, string } from "yup";
+import { object, string, mixed } from "yup";
 import Grid from "@mui/material/Grid";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
@@ -14,6 +14,7 @@ import TextField from '../../shared/components/UIElements/TextField'
 import Button from '../../shared/components/UIElements/Button'
 import Snackbar from '../../shared/components/UIElements/Snackbar'
 import ErrorModal from '../../shared/components/UIElements/ErrorModal'
+import ImageUpload from '../../shared/components/UIElements/ImageUpload'
 import { selectId } from '../../store/loginSlice'
 
 // ValidationSchema
@@ -21,7 +22,8 @@ const validationSchema = object({
     title: string().required("Title required"),
     description: string().required('Description required')
         .min(5, "Description must contain at least 5 characters"),
-    address: string().required("Address required")
+    address: string().required("Address required"),
+    image: mixed().required()
 })
 
 
@@ -40,30 +42,35 @@ const NewPlace = () => {
     const initialFormState = {
         title: "",
         description: "",
-        address: ""
+        address: "",
+        image: null
     }
     console.log(loggedUser) // test
     // Handler functions
     // Submits data to the server
     const submitHandler = async (values, actions) => {
         try {
+            let formData = new FormData()
+            //  Data inputs via formData (values)
+            formData.append('title', values.title) 
+            formData.append('description', values.description)
+            formData.append('address', values.address)
+            formData.append('creator', loggedUser)
+            formData.append('image', values.image)
+            // Data inputs using formData (values)
             const response = await fetch('http://127.0.0.1:5000/api/places/', {
                 method: 'POST',
-                headers: {
-                    'Content-type': 'application/json',
-                },
-                mode: 'cors',
-                body: JSON.stringify({    // body has to be in JSON format!
-                    title: values.title,
-                    description: values.description,
-                    address: values.address,
-                    creator: loggedUser
-                })
+                // headers: {
+                //     'Content-type': 'application/json',
+                // },
+                // mode: 'cors',
+                body: formData
             })
             const responseData = await response.json()
             if (!response.ok) {
                 throw new Error(responseData.message)    
             }
+            console.log('ResponseData:') // testing ImageUpload
             console.log(responseData)
             setOpenSnackbar(true);
             actions.resetForm(initialFormState);  // actions.setSubmitting(false) not needed with async
@@ -113,7 +120,7 @@ const NewPlace = () => {
                 onSubmit={submitHandler}
             >
                 {
-                    ({ isSubmitting }) => (
+                    (formProps) => (
                         <Form>
                             <Grid container spacing={2}>
                                 <Grid item mobile={12}>
@@ -134,6 +141,16 @@ const NewPlace = () => {
                                         name='title'
                                         label='Title'
                                         type='text'
+                                    />
+                                </Grid>
+                                <Grid item mobile={12}>
+                                    <ImageUpload
+                                        image={formProps.values.image}
+                                        width='100%'
+                                        height='150px'
+                                        handleImageUpload={(event) => {
+                                            formProps.setFieldValue("image", event.target.files[0]);
+                                        }}
                                     />
                                 </Grid>
                                 <Grid item mobile={12}>
@@ -178,7 +195,7 @@ const NewPlace = () => {
                                     />
                                 </Grid>
                                 {
-                                    isSubmitting && (
+                                    formProps.isSubmitting && (
                                         <Grid item mobile={12}>
                                             <LinearProgress />
                                         </Grid>

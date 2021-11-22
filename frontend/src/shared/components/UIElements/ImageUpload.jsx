@@ -31,8 +31,8 @@ const AvatarWrapper = (props) => {
                 marginBottom: '0.75rem',
                 backgroundColor: 'white',
                 color: '#f50057',      
-                width: 150,    
-                height: 150
+                width: props.width,      
+                height: props.height  
             }}
         />
     )
@@ -51,7 +51,7 @@ const ImageUpload = (props) => {
                     multiple
                     onChange={props.handleImageUpload}  
                 />
-                <AvatarWrapper image={props.image} />   {/* image={values.image} goes to Formik  */}
+                <AvatarWrapper image={props.image} width={props.width} height={props.height}/>   {/* image={values.image} goes to Formik  */}
                 <Button
                     fullWidth
                     color='secondary'
