@@ -31,6 +31,7 @@ const UserPlaces = () => {
         if (!response.ok) {
           throw new Error(responseData.message)    
         }
+        console.log('Places: ')
         console.log(responseData.places) //test
         setIsLoading(false)
         setUserPlaces(responseData.places)

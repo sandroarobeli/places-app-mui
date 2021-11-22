@@ -1,5 +1,6 @@
 // Third party modules
 const mongoose = require('mongoose')
+const fs = require('fs')
 const { validationResult } = require('express-validator')
 
 // Custom modules
@@ -90,10 +91,10 @@ const createPlace = async (req, res, next) => {
     const createdPlace = new Place({
         title,
         description,
-        image: "https://cdn.britannica.com/88/80588-050-8D944BFE/Leaning-Tower-of-Pisa-Italy.jpg",
+        image: req.file.path +  '.' + req.file.mimetype.match(/\/([\s\S]*)$/)[1], // attaches extension
         address,
         location: coordinates,
-        creator: creator     // test for now, DELETE later  '618febb96a54e02a79e6bfb8' 
+        creator: creator     
     })
     console.log(creator) // test
     // This block ensures that only existing user can create a new place
@@ -109,6 +110,17 @@ const createPlace = async (req, res, next) => {
 
     // THIS TRY-CATCH ENSURES PROPER NETWORK PROTOCOL EXCHANGE
     try {
+        
+        console.log('req.file') // test
+        console.log(req.file) // test
+        
+        // Change image name in uploads/images dir to exactly how I create it in database!!!.
+        fs.rename(req.file.path, req.file.path + '.' + req.file.mimetype.match(/\/([\s\S]*)$/)[1], (error) => {
+            if (error) {
+                throw error;    
+            }
+            console.log('Renaming complete!');
+        })
         // Transactions let you execute multiple operations 
         // In isolation and potentially undo all the operations if one of them fails.
         const session = await mongoose.startSession()
@@ -170,6 +182,10 @@ const deletePlaceById = async (req, res, next) => {
     } catch (error) {
         return next(new HttpError(`Deleting Place failed: ${error.message}`, 500))
     }
+ 
+    // Removing place image from uploads/images dir upon deletion
+    // Save the path in this variable, after deletion, place.image will become undefined 
+    const imagePath = deletedPlace.image
 
     try {
         const session = await mongoose.startSession()
@@ -180,6 +196,11 @@ const deletePlaceById = async (req, res, next) => {
         await deletedPlace.creator.save({ session: session })
         await session.commitTransaction()
         // End Transaction
+
+        // Once deleting from DB succeeded, we can remove it from uploads/images as well
+        fs.unlink(imagePath, (error) => {
+            console.log(error)
+        })
 
         res.status(200).json({ message: `${deletedPlace.title} has been successfully deleted`})
     } catch (error) {

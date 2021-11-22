@@ -10,6 +10,8 @@ import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 import Grid from "@mui/material/Grid";
+import Avatar from '@mui/material/Avatar'
+
 
 // Custom imports
 import MapModal from "../../shared/components/UIElements/MapModal";
@@ -52,7 +54,7 @@ const PlaceItem = (props) => {
   // Manages snackbar
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
-        return
+      return
     }
     setOpenSnackbar(false)
   }
@@ -72,7 +74,7 @@ const PlaceItem = (props) => {
       })
       const responseData = await response.json()
       if (!response.ok) {
-        throw new Error(responseData.message)    
+        throw new Error(responseData.message)
       }
       console.log(`${props.title} has been deleted!`); //test
       setIsLoadingSpinner(false)
@@ -95,7 +97,7 @@ const PlaceItem = (props) => {
         }
       }}
     >
-      <Card
+     <Card
         sx={{
           boxShadow: "0 2px 8px rgba(0, 0, 0, 0.26)",
           borderRadius: "6px",
@@ -113,17 +115,24 @@ const PlaceItem = (props) => {
           />
         }
         <CardActionArea>
-          <CardMedia
-            image={props.image}
-            title={props.title}
-            sx={{
-              objectFit: "cover",
-              width: "100%",
-              height: {
-                mobile: '12.5rem',
-                tablet: '25rem'
-              }
-            }}
+        <CardMedia
+          component={
+            () =>
+              <Avatar
+                variant='square'
+                src={`http://127.0.0.1:5000/${props.image}`}  
+                alt={props.title}
+                title={props.title}
+                sx={{
+                  objectFit: "cover",
+                  width: "100%",
+                  height: {
+                    mobile: '12.5rem',
+                    tablet: '25rem'
+                  }
+                }}
+              />
+            }
           />
           <CardContent>
             <Typography
@@ -258,4 +267,7 @@ const PlaceItem = (props) => {
   )
 };
   
-  export default PlaceItem;
+export default PlaceItem;
+  
+
+

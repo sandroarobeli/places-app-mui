@@ -4,6 +4,7 @@ const { check } = require('express-validator')
 
 // Custom modules
 const placesControllers = require('../controllers/places-controller')
+const fileUpload = require('../middleware/file-upload')
 
 // Initializing the router object
 const router = express.Router()
@@ -20,7 +21,8 @@ router.get('/user/alt/:userId', placesControllers.getPlacesByUserId2)
 
 // Create a new Place
 router.post(
-    '/', 
+    '/',
+    fileUpload.single('image'),
     [
         check('title')
             .not()
