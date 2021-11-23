@@ -67,7 +67,7 @@ const Signup = (props) => {
       console.log('ResponseData:') // testing ImageUpload
       console.log(responseData)
       actions.resetForm(initialFormState);  // actions.setSubmitting(false) not needed with async
-      dispatch(loginUser(responseData.user.id))
+      dispatch(loginUser(responseData.userId))
     } catch (error) {
       // errors ans setErrors for Formik have to do with frontend Form validation, not backend!
       // Thats why backend errors are handled as a separate state variable here  

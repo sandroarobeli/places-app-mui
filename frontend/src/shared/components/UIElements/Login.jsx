@@ -61,9 +61,10 @@ const Login = () => {
       if (!response.ok) {
         throw new Error(responseData.message)
       }
-      console.log(responseData.user.id) // test
+      console.log('responseData:')
+      console.log(responseData) // test
       actions.resetForm(initialFormState);  // actions.setSubmitting(false) not needed with async
-      dispatch(loginUser(responseData.user.id))
+      dispatch(loginUser(responseData.userId))
       history.push(`/${loggedUser}/places`) // test
     } catch (error) {
       // errors ans setErrors for Formik have to do with frontend Form validation, not backend!

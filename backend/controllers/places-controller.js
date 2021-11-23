@@ -36,7 +36,8 @@ const getPlacesByUserId = async (req, res, next) => {
             // IN SYNCHRONOUS MODE USE next(error) OR throw new Error('some generic message'),
             // IN A-SYNCHRONOUS MODE ONLY USE return next(error)
             // NOTE: NO ERROR NEEDED HERE, THIS IS NOT AN ERROR. SIMPLY NO PLACES EXIST
-            return next(new HttpError(`No places found for this user`, 404))
+            //return next(new HttpError(`No places found for this user`, 404))
+            console.log('No places found for this User')
            
         }
         // adds id property (in addition to _id) to the returned Object(s)

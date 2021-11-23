@@ -5,6 +5,7 @@ const { check } = require('express-validator')
 // Custom modules
 const placesControllers = require('../controllers/places-controller')
 const fileUpload = require('../middleware/file-upload')
+const checkAuthorization = require('../middleware/check-authorization')
 
 // Initializing the router object
 const router = express.Router()
@@ -19,7 +20,11 @@ router.get('/user/:userId', placesControllers.getPlacesByUserId)
 // List all places created by a given user II (ALTERNATIVE VERSION)
 router.get('/user/alt/:userId', placesControllers.getPlacesByUserId2)
 
-// Create a new Place
+// One way of doing things. general middleware .use() function. 
+// Fires on any method after it, so privileged routes are places after it.
+router.use(checkAuthorization)
+
+// Create a new Place (PRIVILEGED, AUTHORIZATION REQUIRED)
 router.post(
     '/',
     fileUpload.single('image'),
@@ -36,7 +41,7 @@ router.post(
     placesControllers.createPlace
 ) 
 
-// Update place
+// Update place (PRIVILEGED, AUTHORIZATION REQUIRED)
 router.patch(
     '/:placeId',
     [
@@ -48,7 +53,7 @@ router.patch(
     ],
     placesControllers.updatePlaceById)
 
-// delete Place
+// delete Place (PRIVILEGED, AUTHORIZATION REQUIRED)
 router.delete('/:placeId', placesControllers.deletePlaceById)
 
 module.exports = router

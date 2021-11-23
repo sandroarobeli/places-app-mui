@@ -53,7 +53,7 @@ const SideDrawer = (props) => {
           <LinkTab label='all users' to='/' onClick={props.onClose} />
           {loggedIn && <LinkTab label='my places' to={`/${loggedUser}/places`} onClick={props.onClose} />}
           {loggedIn && <LinkTab label='add place' to='/places/new' onClick={props.onClose} />}
-          {loggedIn && <LinkTab label='authenticate' to='/authenticate' onClick={props.onClose} />}
+          {!loggedIn && <LinkTab label='authenticate' to='/authenticate' onClick={props.onClose} />}
           {loggedIn && <LinkTab label='logout' to='/authenticate' onClick={props.onLogout} />}
         </Tabs>
       </Drawer>
