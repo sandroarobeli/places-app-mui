@@ -12,7 +12,7 @@ import MainNavigation from "./shared/components/Navigation/MainNavigation";
 import UserPlaces from "./places/pages/UserPlaces";
 import UpdatePlace from "./places/pages/UpdatePlace";
 import Authenticate from "./user/pages/Authenticate";
-import { selectLogin } from './store/loginSlice'
+import { selectIsLoggedIn } from './store/loginSlice'
 
 
 // Custom theme module. Override default colors, breakpoints etc. to match customer' requirements
@@ -41,12 +41,12 @@ const theme = createTheme({
 
 const Main = (props) => {
   // From Redux
-  const loggedIn = useSelector(selectLogin)
+  const isLoggedIn = useSelector(selectIsLoggedIn)
  
   
   // Locking down available routes depending on User's logged in/out status
   let routes
-  if (loggedIn) {
+  if (isLoggedIn) {
     routes = (
       <Switch>
         <Route path='/' exact>

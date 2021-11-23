@@ -13,7 +13,7 @@ import TextField from './TextField'
 import Button from './Button'
 import ErrorModal from './ErrorModal'
 import ImageUpload from './ImageUpload'
-import { loginUser, selectId } from '../../../store/loginSlice'
+import { loginUser, selectIsLoggedIn, selectToken } from '../../../store/loginSlice'
 
 
 // ValidationSchema
@@ -35,7 +35,8 @@ const Signup = (props) => {
   const [backendError, setBackendError] = useState('')
   
   // From redux
-  const loggedUser = useSelector(selectId)
+  const isLoggedIn = useSelector(selectIsLoggedIn)
+  const token = useSelector(selectToken)
   const dispatch = useDispatch()
     
   const initialFormState = {
@@ -67,7 +68,7 @@ const Signup = (props) => {
       console.log('ResponseData:') // testing ImageUpload
       console.log(responseData)
       actions.resetForm(initialFormState);  // actions.setSubmitting(false) not needed with async
-      dispatch(loginUser(responseData.user.id))
+      dispatch(loginUser(responseData.token)) // Since we changes what props get returned, it's userId now..
     } catch (error) {
       // errors ans setErrors for Formik have to do with frontend Form validation, not backend!
       // Thats why backend errors are handled as a separate state variable here  

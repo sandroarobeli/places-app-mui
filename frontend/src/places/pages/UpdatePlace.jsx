@@ -15,7 +15,7 @@ import Button from '../../shared/components/UIElements/Button'
 import Snackbar from '../../shared/components/UIElements/Snackbar'
 import ErrorModal from '../../shared/components/UIElements/ErrorModal'
 import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner'
-import { selectId } from '../../store/loginSlice'
+import { selectToken } from '../../store/loginSlice'
 
 // ValidationSchema
 const validationSchema = object({
@@ -37,7 +37,7 @@ const UpdatePlace = () => {
   const placeId = useParams().placeId;
   
   // From Redux
-  const loggedUser = useSelector(selectId)
+  const token = useSelector(selectToken)
 
   // History module
   const history = useHistory()
@@ -88,7 +88,7 @@ const UpdatePlace = () => {
       setOpenSnackbar(true);
      // setInitialFormState({ title: '', description: '', address: ''})
       //actions.resetForm(initialFormState);  // actions.setSubmitting(false) not needed with async
-      history.push(`/${loggedUser}/places`)
+      history.push(`/${token.userId}/places`)
     } catch (error) {
        // errors ans setErrors for Formik have to do with frontend Form validation, not backend!
        // Thats why backend errors are handled as a separate state variable here  

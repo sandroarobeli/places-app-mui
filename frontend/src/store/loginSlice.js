@@ -1,24 +1,28 @@
 import { createSlice } from '@reduxjs/toolkit'
 
+// BEFORE GOING BACK TRY REDOING THE STORE PROPS (KEEPING ONLY TOKEN AND ACCESSING user_id via)
+// (token.userId)
+
+
 export const loginSlice = createSlice({
     name: 'login',
     initialState: {
-        loggedIn: false,
-        user_id: ''
+        token: null,
+        isLoggedIn: false
     },
     reducers: {
         loginUser: (state, action) => {
            return {
                 ...state,
-                loggedIn: true,
-                user_id: action.payload
+                token: action.payload,
+                isLoggedIn: true
             }
         },
         logoutUser: (state, action) => {
             return {
                 ...state,
-                loggedIn: false,
-                user_id: ''
+                token: null,
+                isLoggedIn: false
             }
         }
     }
@@ -27,7 +31,7 @@ export const loginSlice = createSlice({
 
 export const { loginUser, logoutUser } = loginSlice.actions
 
-export const selectLogin = (state) => state.login.loggedIn
-export const selectId = (state) => state.login.user_id
+export const selectToken = (state) => state.login.token
+export const selectIsLoggedIn = (state) => state.login.isLoggedIn
 
 export default loginSlice.reducer

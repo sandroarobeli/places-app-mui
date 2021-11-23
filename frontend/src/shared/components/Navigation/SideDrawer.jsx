@@ -7,7 +7,7 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 
 // Custom imports
-import { selectLogin, selectId } from '../../../store/loginSlice'
+import { selectToken, selectIsLoggedIn } from '../../../store/loginSlice'
 
 
 const LinkTab = (props) => {
@@ -30,8 +30,8 @@ const LinkTab = (props) => {
 
 const SideDrawer = (props) => {
   // From Redux
-  const loggedIn = useSelector(selectLogin)
-  const loggedUser = useSelector(selectId)
+  const isLoggedIn = useSelector(selectIsLoggedIn)
+  const token = useSelector(selectToken)
   
   return (
     <React.Fragment>
@@ -51,10 +51,10 @@ const SideDrawer = (props) => {
           sx={{ width: "20rem" }}
         >
           <LinkTab label='all users' to='/' onClick={props.onClose} />
-          {loggedIn && <LinkTab label='my places' to={`/${loggedUser}/places`} onClick={props.onClose} />}
-          {loggedIn && <LinkTab label='add place' to='/places/new' onClick={props.onClose} />}
-          {loggedIn && <LinkTab label='authenticate' to='/authenticate' onClick={props.onClose} />}
-          {loggedIn && <LinkTab label='logout' to='/authenticate' onClick={props.onLogout} />}
+          {isLoggedIn && <LinkTab label='my places' to={`/${token.userId}/places`} onClick={props.onClose} />}
+          {isLoggedIn && <LinkTab label='add place' to='/places/new' onClick={props.onClose} />}
+          {!token && <LinkTab label='authenticate' to='/authenticate' onClick={props.onClose} />}
+          {isLoggedIn && <LinkTab label='logout' to='/authenticate' onClick={props.onLogout} />}
         </Tabs>
       </Drawer>
     </React.Fragment>

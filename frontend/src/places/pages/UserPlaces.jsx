@@ -8,11 +8,11 @@ import { useParams } from "react-router-dom";
 import PlaceList from "../components/PlaceList";
 import ErrorModal from '../../shared/components/UIElements/ErrorModal'
 import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner'
-import { selectId } from '../../store/loginSlice'
+import { selectToken } from '../../store/loginSlice'
 
 const UserPlaces = () => {
   // From redux
-  const loggedUser = useSelector(selectId)
+  const token = useSelector(selectToken)
   
   // Access to the dynamic segments
   const userId = useParams().userId;
@@ -66,7 +66,7 @@ const UserPlaces = () => {
           color="#f8df00"
         />
       }
-      <PlaceList items={userPlaces} userId={userId} loggedUser={loggedUser} onDelete={placeDeleteHandler} />
+      <PlaceList items={userPlaces} userId={userId} loggedUser={userId} onDelete={placeDeleteHandler} />
       <ErrorModal
         open={!!backendError}  // turns truthy error.message string into boolean
         errorMessage={backendError}  // display backendError on ErrorModal

@@ -19,13 +19,13 @@ import DeleteModal from "../../shared/components/UIElements/DeleteModal";
 import Snackbar from '../../shared/components/UIElements/Snackbar'
 import ErrorModal from '../../shared/components/UIElements/ErrorModal'
 import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner'
-import { selectId } from '../../store/loginSlice'
+import { selectToken } from '../../store/loginSlice'
 
 
 
 const PlaceItem = (props) => {
   // From Redux
-  const loggedUser = useSelector(selectId)
+  const token = useSelector(selectToken)
 
   // State management module
   const [openMap, setOpenMap] = useState(false)
@@ -195,7 +195,7 @@ const PlaceItem = (props) => {
           >
             View on map
           </Button>
-          {loggedUser === props.creatorId && <Button
+          {token.userId === props.creatorId && <Button
             variant='contained'
             color='secondary'
             component={Link}
@@ -212,7 +212,7 @@ const PlaceItem = (props) => {
           >
             Edit
           </Button>}
-          {loggedUser === props.creatorId && <Button
+          {token.userId === props.creatorId && <Button
             variant='contained'
             onClick={handleDeleteModalOpen}
             sx={{

@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux'
 import UsersList from "../components/UsersList";
 import ErrorModal from '../../shared/components/UIElements/ErrorModal'
 import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner'
-import { selectId } from '../../store/loginSlice'   
+import { selectToken } from '../../store/loginSlice'   
 
 const Users = () => {
   // State management
@@ -15,7 +15,7 @@ const Users = () => {
   const [loadedUsers, setLoadedUsers] = useState([])
 
   // From Redux
-  const loggedUser = useSelector(selectId)
+  const token = useSelector(selectToken)
 
   useEffect(() => {
     const sendRequest = async () => {
@@ -27,7 +27,7 @@ const Users = () => {
           throw new Error(responseData.message)    
         }
         console.log('Current users ID: ')
-        console.log(loggedUser) // test reads from response
+        console.log(token) // test reads from response
         console.log(responseData.users)
         setIsLoading(false)
         setLoadedUsers(responseData.users)
