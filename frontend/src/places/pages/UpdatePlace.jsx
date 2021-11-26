@@ -15,7 +15,7 @@ import Button from '../../shared/components/UIElements/Button'
 import Snackbar from '../../shared/components/UIElements/Snackbar'
 import ErrorModal from '../../shared/components/UIElements/ErrorModal'
 import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner'
-import { selectId } from '../../store/loginSlice'
+import { selectId, selectToken } from '../../store/loginSlice'
 
 // ValidationSchema
 const validationSchema = object({
@@ -38,6 +38,7 @@ const UpdatePlace = () => {
   
   // From Redux
   const loggedUser = useSelector(selectId)
+  const token = useSelector(selectToken)
 
   // History module
   const history = useHistory()
@@ -72,7 +73,8 @@ const UpdatePlace = () => {
       const response = await fetch(`http://127.0.0.1:5000/api/places/${placeId}`, {
         method: 'PATCH',
         headers: {
-          'Content-type': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
         },
         mode: 'cors',
         body: JSON.stringify({
@@ -84,7 +86,12 @@ const UpdatePlace = () => {
       if (!response.ok) {
         throw new Error(responseData.message)    
       }
+      console.log('responseData')
       console.log(responseData)
+      console.log('loggedUser')
+      console.log(loggedUser)
+      console.log('token')
+      console.log(token)
       setOpenSnackbar(true);
      // setInitialFormState({ title: '', description: '', address: ''})
       //actions.resetForm(initialFormState);  // actions.setSubmitting(false) not needed with async

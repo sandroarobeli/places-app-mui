@@ -8,6 +8,7 @@ const HttpError = require('../models/http-error')
 const getCoordinates = require('../utilities/geolocation')
 const Place = require('../models/place-model')
 const User = require('../models/user-model')
+const { findById } = require('../models/place-model')
 
 // List the place by its ID
 const getPlaceById  = async (req, res, next) => {
@@ -155,15 +156,29 @@ const updatePlaceById = async (req, res, next) => {
     const placeId = req.params.placeId
     const { title, description } = req.body
     
+    let updatedPlace
     try {
-        const updatedPlace = await Place.findByIdAndUpdate(
+        updatedPlace = await Place.findById(placeId)
+        // Checking if we can find the place
+        if (!updatedPlace) {
+            return next(new HttpError(`Place could not be found`, 404))
+        }
+        // Once found, we make sure (here, on backend) that ONLY whomever created This
+        // Place MAY update it as well!
+        console.log('updatedPlace: ')// test
+        console.log(updatedPlace) // test
+        if (updatedPlace.creator.toString() !== req.userData.userId) {
+            // updatedPlace.creator --> WHO CREATED THIS PLACE
+            // req.userData.userId --> WHO IS CURRENTLY LOGGED IN
+            return next(new HttpError(`You are not authorized to edit this place!`, 401))    
+        }
+        // Once verified, we allow the editing to proceed
+        updatedPlace = await Place.findByIdAndUpdate(
             placeId,
             { title, description },
             { new: true }
         )
-        if (!updatedPlace) {
-            return next(new HttpError(`Place with ID: ${placeId} not found`, 404))
-        }
+        
         res.status(200).json({ place: updatedPlace.toObject({ getters: true }) })
     } catch (error) {
         return next(new HttpError(`Updating Place failed: ${error.message}`, 500))
@@ -178,8 +193,20 @@ const deletePlaceById = async (req, res, next) => {
         // Makes full User object available via Place
         deletedPlace = await Place.findById(placeId).populate('creator') 
         if (!deletedPlace) {
-            return next(new Error(`Place with ID: ${placeId} not found`, 404))
+            return next(new Error(`Place could not be found`, 404))
         }
+        console.log('deletedPlace: ') // test
+        console.log(deletedPlace.creator._id)// test
+        // Once found, we make sure (here, on backend) that ONLY whomever created This
+        // Place MAY delete it as well! NOTE: since 'creator' is populated, it's
+        // displayed a full object with all the User props for creator. Hence,
+        // we first go to _id prop and then convert it to string!
+        if (deletedPlace.creator._id.toString() !== req.userData.userId) {
+            // deletedPlace.creator --> WHO CREATED THIS PLACE
+            // req.userData.userId --> WHO IS CURRENTLY LOGGED IN
+            return next(new HttpError(`You are not authorized to delete this place!`, 401))    
+        }
+
     } catch (error) {
         return next(new HttpError(`Deleting Place failed: ${error.message}`, 500))
     }

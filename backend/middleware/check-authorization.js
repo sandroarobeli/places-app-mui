@@ -8,6 +8,9 @@ const HttpError = require('../models/http-error')
 // This middleware function checks if we have a token and if so,
 // Whether it's valid or not
 module.exports = (req, res, next) => {
+    if (req.method === 'OPTIONS') {  // Just an extra precaution
+        return next()
+    }
     try {
         const token = req.headers.authorization.split(' ')[1] // Format -> authorization: 'Bearer TOKEN'
         // There is NO token object received with request.header 
@@ -22,7 +25,7 @@ module.exports = (req, res, next) => {
         next() // calling next() without an error allows request to continue it's journey!
     } catch (error) {
         // General catch
-        return next(new HttpError(`Authentication failed\n${error.message}`, 401))
+        return next(new HttpError(`Authentication failed\n${error.message}`, 403))
     }
     
     

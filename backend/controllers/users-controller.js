@@ -88,8 +88,8 @@ const signup = async (req, res, next) => {
         try {
             token = jwt.sign(
                 {userId: createdUser.id, email: createdUser.email},
-                process.env.JWT_PRIVATE_KEY,
-                { expiresIn: '1h'}
+                process.env.JWT_PRIVATE_KEY //,
+                //{ expiresIn: '1h'}
             )
         } catch (error) {
             return next(new HttpError('Creating User failed. Please try again', 500))
@@ -109,7 +109,7 @@ const login = async (req, res, next) => {
     try {
         const existingUser = await User.findOne({ email })
         if (!existingUser) {
-            return next(new HttpError('The email not found. Please enter a valid email or proceed to signup.', 422))
+            return next(new HttpError('The email not found. Please enter a valid email or proceed to signup.', 403))
         }
         
         // Check if existingUser.password matches hashed version of newly entered plaintext password
@@ -122,7 +122,7 @@ const login = async (req, res, next) => {
         // Catch block right above deals with connection etc. type errors
         // isValidPassword = false is a valid result and gets addressed below
         if (!isValidPassword) {
-            return next(new HttpError('Invalid credentials entered. Please check your credentials and try again', 401))
+            return next(new HttpError('Invalid credentials entered. Please check your credentials and try again', 403))
         }
 
         // After we ensure user(its email) exists, and the passwords match,
@@ -133,8 +133,8 @@ const login = async (req, res, next) => {
         try {
             token = jwt.sign(
                 {userId: existingUser.id, email: existingUser.email},
-                process.env.JWT_PRIVATE_KEY,
-                { expiresIn: '1h'}
+                process.env.JWT_PRIVATE_KEY //,
+              //  { expiresIn: '1h'}
             )
         } catch (error) {
             return next(new HttpError('Login failed. Please try again', 500))

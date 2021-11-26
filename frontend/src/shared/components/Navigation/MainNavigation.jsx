@@ -64,6 +64,8 @@ const MainNavigation = () => {
   };
   const handleLogout = () => {
     dispatch(logoutUser())
+    // As we log out, we ensure to clear the localStorage
+    localStorage.removeItem('userData')
     setDrawerOpen(false);
   }
 

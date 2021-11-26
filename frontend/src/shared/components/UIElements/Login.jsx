@@ -13,7 +13,7 @@ import LinearProgress from "@mui/material/LinearProgress";
 import TextField from './TextField'
 import Button from './Button'
 import ErrorModal from "./ErrorModal";
-import { loginUser, selectLogin, selectId } from '../../../store/loginSlice'
+import { loginUser, selectId, selectToken } from '../../../store/loginSlice'
 
 
 
@@ -35,6 +35,7 @@ const Login = () => {
   
   // From redux
   const loggedUser = useSelector(selectId)
+  const token = useSelector(selectToken)
   const dispatch = useDispatch()
 
   const initialFormState = {
@@ -43,6 +44,12 @@ const Login = () => {
   }
 
   // Handler functions
+  // Saves userId & token into localStorage, ensures surviving page reloads 
+  const setLocalStorage = (userId, token) => {
+    localStorage.setItem('userData', JSON.stringify({ userId: userId, token: token }))
+  }
+
+  
   // Submits data to the server
   const submitHandler = async (values, actions) => {
     try {
@@ -64,7 +71,21 @@ const Login = () => {
       console.log('responseData:')
       console.log(responseData) // test
       actions.resetForm(initialFormState);  // actions.setSubmitting(false) not needed with async
-      dispatch(loginUser(responseData.userId))
+    //  dispatch(loginUser(responseData.userId))
+      //test start
+      dispatch(loginUser({
+        userId: responseData.userId,
+        token: responseData.token,
+      }))
+
+      // Invokes setLocalStorage function 
+      setLocalStorage(responseData.userId, responseData.token)
+      
+      // console.log('loggedUser')
+      // console.log(loggedUser)
+      // console.log('token')
+      // console.log(token)
+      // test end
       history.push(`/${loggedUser}/places`) // test
     } catch (error) {
       // errors ans setErrors for Formik have to do with frontend Form validation, not backend!
