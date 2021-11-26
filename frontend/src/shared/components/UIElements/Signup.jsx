@@ -13,7 +13,7 @@ import TextField from './TextField'
 import Button from './Button'
 import ErrorModal from './ErrorModal'
 import ImageUpload from './ImageUpload'
-import { loginUser, selectId } from '../../../store/loginSlice'
+import { loginUser, selectId, selectToken } from '../../../store/loginSlice'
 
 
 // ValidationSchema
@@ -36,6 +36,7 @@ const Signup = (props) => {
   
   // From redux
   const loggedUser = useSelector(selectId)
+  const token = useSelector(selectToken)
   const dispatch = useDispatch()
     
   const initialFormState = {
@@ -46,6 +47,11 @@ const Signup = (props) => {
   }
 
   // Handler functions
+  // Saves userId & token into localStorage, ensures surviving page reloads 
+  const setLocalStorage = (userId, token) => {
+    localStorage.setItem('userData', JSON.stringify({ userId: userId, token: token }))
+  }
+
   // Submits data to the server
   const submitHandler = async (values, actions) => {
     try {
@@ -67,7 +73,13 @@ const Signup = (props) => {
       console.log('ResponseData:') // testing ImageUpload
       console.log(responseData)
       actions.resetForm(initialFormState);  // actions.setSubmitting(false) not needed with async
-      dispatch(loginUser(responseData.user.id))
+      dispatch(loginUser({
+        userId: responseData.userId,
+        token: responseData.token
+      }))
+
+      // Invokes setLocalStorage function 
+      setLocalStorage(responseData.userId, responseData.token)
     } catch (error) {
       // errors ans setErrors for Formik have to do with frontend Form validation, not backend!
       // Thats why backend errors are handled as a separate state variable here  

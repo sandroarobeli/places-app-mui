@@ -15,7 +15,7 @@ import Button from '../../shared/components/UIElements/Button'
 import Snackbar from '../../shared/components/UIElements/Snackbar'
 import ErrorModal from '../../shared/components/UIElements/ErrorModal'
 import ImageUpload from '../../shared/components/UIElements/ImageUpload'
-import { selectId } from '../../store/loginSlice'
+import { selectId, selectToken } from '../../store/loginSlice'
 
 // ValidationSchema
 const validationSchema = object({
@@ -36,6 +36,7 @@ const NewPlace = () => {
 
     // From Redux
     const loggedUser = useSelector(selectId)
+    const token = useSelector(selectToken)
 
     const history = useHistory()
 
@@ -45,7 +46,7 @@ const NewPlace = () => {
         address: "",
         image: null
     }
-    console.log(loggedUser) // test
+    
     // Handler functions
     // Submits data to the server
     const submitHandler = async (values, actions) => {
@@ -60,9 +61,9 @@ const NewPlace = () => {
             // Data inputs using formData (values)
             const response = await fetch('http://127.0.0.1:5000/api/places/', {
                 method: 'POST',
-                // headers: {
-                //     'Content-type': 'application/json',
-                // },
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                },
                 // mode: 'cors',
                 body: formData
             })
@@ -72,6 +73,10 @@ const NewPlace = () => {
             }
             console.log('ResponseData:') // testing ImageUpload
             console.log(responseData)
+            console.log('loggedUser')
+            console.log(loggedUser)
+            console.log('token')
+            console.log(token)
             setOpenSnackbar(true);
             actions.resetForm(initialFormState);  // actions.setSubmitting(false) not needed with async
             history.push('/')

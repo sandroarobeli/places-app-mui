@@ -1,6 +1,9 @@
 // Third party modules
 const { validationResult } = require('express-validator')
 const fs = require('fs')
+const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
+require("dotenv").config();
 
 // Custom modules
 const HttpError = require('../models/http-error')
@@ -12,7 +15,9 @@ const getUsers = async (req, res, next) => {
     try {
         const AllUsers = await User.find({}, 'name email image places') // only shows name, email, image & places properties
         if (AllUsers.length === 0) {
-            return next(new HttpError('No users found', 404))
+           // return next(new HttpError('No users found', 404))
+           // Having no users is NOT an error, thus should't throw an ErrorModal
+           console.log('No Users Found') 
         }
         res.status(200).json({ users: AllUsers.map(user => user.toObject({ getters: true }))})
     } catch (error) {
@@ -42,12 +47,20 @@ const signup = async (req, res, next) => {
     } catch (error) {
         return next(new HttpError(`Signup failed: ${error.message}`, 500))
     }
+
+    // Hashing plain text password before saving it in DB
+    let hashedPassword   // second argument is number of cascades used to encrypt it
+    try {
+     hashedPassword = await bcrypt.hash(password, 8)   
+    } catch (error) {
+        return next(new HttpError('Creating User failed. Please try again', 500))
+    }
     
     // combining all of above to create a new user
     const createdUser = new User({
         name,
         email,
-        password,
+        password: hashedPassword,
         image: req.file.path +  '.' + req.file.mimetype.match(/\/([\s\S]*)$/)[1], // attaches extension 
         places: []
     })
@@ -64,8 +77,25 @@ const signup = async (req, res, next) => {
         })
         await createdUser.save()
         // Send Welcome email (DOESN'T NEED ASYNC AWAIT, WHEN A USER GETS IT IS NOT IMPORTANT)
-        templateEmails.sendWelcomeEmail(name, email)        
-        res.status(201).json({ user: createdUser.toObject({ getters: true })})
+        templateEmails.sendWelcomeEmail(name, email)
+        
+        
+        // Create token, so we can send it back as proof of authorization.
+        // We get to decide what data we encode. This time it's userId & email 
+        // This way, frontend will attach this token to the requests going to routes that 
+        // REQUIRE AUTHORIZATION
+        let token
+        try {
+            token = jwt.sign(
+                {userId: createdUser.id, email: createdUser.email},
+                process.env.JWT_PRIVATE_KEY //,
+                //{ expiresIn: '1h'}
+            )
+        } catch (error) {
+            return next(new HttpError('Creating User failed. Please try again', 500))
+        }
+        // Plus, we get to decide what props we send back to the frontend (Need to send Token!)
+        res.status(201).json({ userId: createdUser.id, email: createdUser.email, token: token })
     } catch (error) {
         return next(new HttpError(`Creating User failed: ${error.message}`, 500))
     }
@@ -79,14 +109,44 @@ const login = async (req, res, next) => {
     try {
         const existingUser = await User.findOne({ email })
         if (!existingUser) {
-            return next(new HttpError('The email not found. Please enter a valid email or proceed to signup.', 422))
-        } else if (existingUser.password !== password) {
-            return next(new HttpError('Invalid credentials entered. Please check your credentials and try again', 401))
+            return next(new HttpError('The email not found. Please enter a valid email or proceed to signup.', 403))
         }
-        res.status(200).json({ 
-            message: `Login successful, welcome ${existingUser.name}!`,
-            user: existingUser.toObject({ getters: true })
-        })
+        
+        // Check if existingUser.password matches hashed version of newly entered plaintext password
+        let isValidPassword = false
+        try {
+            isValidPassword = await bcrypt.compare(password, existingUser.password)
+        } catch (error) {
+            return next(new HttpError(`Login failed. Please try again later.\n${error.message}`, 500))
+        }
+        // Catch block right above deals with connection etc. type errors
+        // isValidPassword = false is a valid result and gets addressed below
+        if (!isValidPassword) {
+            return next(new HttpError('Invalid credentials entered. Please check your credentials and try again', 403))
+        }
+
+        // After we ensure user(its email) exists, and the passwords match,
+        // We can generate the Token
+        // This way, frontend will attach this token to the requests going to routes that 
+        // REQUIRE AUTHORIZATION
+        let token
+        try {
+            token = jwt.sign(
+                {userId: existingUser.id, email: existingUser.email},
+                process.env.JWT_PRIVATE_KEY //,
+              //  { expiresIn: '1h'}
+            )
+        } catch (error) {
+            return next(new HttpError('Login failed. Please try again', 500))
+        }
+        
+        res.status(200).json({
+            userId: existingUser.id,
+            email: existingUser.email,
+            token: token
+        }) 
+        
+       
     } catch (error) {
         return next(new HttpError(`Login failed: ${error.message}`, 500))
     }

@@ -18,7 +18,11 @@ const PlaceList = (props) => {
                     margin: '3rem auto',
                     padding: '1rem 4rem',
                     textAlign: 'center',
-                    maxWidth: '375px',
+                    maxWidth: {
+                        mobile: '350px',
+                        tablet: '375px',
+                        laptop: '375px'
+                    },
                     background: 'white'
                 }}
             >

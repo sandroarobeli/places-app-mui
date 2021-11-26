@@ -1,6 +1,6 @@
 // Third party imports
-import React from 'react'
-import { useSelector } from 'react-redux'
+import React, { useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom'
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import CssBaseline from '@mui/material/CssBaseline'
@@ -12,7 +12,7 @@ import MainNavigation from "./shared/components/Navigation/MainNavigation";
 import UserPlaces from "./places/pages/UserPlaces";
 import UpdatePlace from "./places/pages/UpdatePlace";
 import Authenticate from "./user/pages/Authenticate";
-import { selectLogin } from './store/loginSlice'
+import { selectLogin, loginUser } from './store/loginSlice'
 
 
 // Custom theme module. Override default colors, breakpoints etc. to match customer' requirements
@@ -42,8 +42,26 @@ const theme = createTheme({
 const Main = (props) => {
   // From Redux
   const loggedIn = useSelector(selectLogin)
+  const dispatch = useDispatch()
  
+  // Main as part of App loads first. In our case that happens on every reload
+  // Thus, we check if the user is logged in (localStorage saves userId and token upon LOGGING-IN &
+  // SIGNING-UP) and if so, restore the user's privileges
+  useEffect(() => {
+    const storedData = JSON.parse(localStorage.getItem('userData'))
+    console.log('StoredData useEffect')// test
+    console.log(storedData)// test      
+    
+    if (storedData && storedData.token) {
+      // If storedData exists & it has token property, we dispatch loginUser to redux store
+      dispatch(loginUser({
+        userId: storedData.userId,
+        token: storedData.token
+      }))
+    }
+  }, [dispatch])
   
+
   // Locking down available routes depending on User's logged in/out status
   let routes
   if (loggedIn) {

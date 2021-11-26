@@ -19,13 +19,14 @@ import DeleteModal from "../../shared/components/UIElements/DeleteModal";
 import Snackbar from '../../shared/components/UIElements/Snackbar'
 import ErrorModal from '../../shared/components/UIElements/ErrorModal'
 import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner'
-import { selectId } from '../../store/loginSlice'
+import { selectId, selectToken } from '../../store/loginSlice'
 
 
 
 const PlaceItem = (props) => {
   // From Redux
   const loggedUser = useSelector(selectId)
+  const token = useSelector(selectToken)
 
   // State management module
   const [openMap, setOpenMap] = useState(false)
@@ -70,6 +71,9 @@ const PlaceItem = (props) => {
     try {
       const response = await fetch(`http://127.0.0.1:5000/api/places/${props.id}`, {
         method: 'DELETE',
+        headers: {
+          'Authorization': 'Bearer ' + token
+        },
         mode: 'cors',
       })
       const responseData = await response.json()
@@ -77,8 +81,12 @@ const PlaceItem = (props) => {
         throw new Error(responseData.message)
       }
       console.log(`${props.title} has been deleted!`); //test
+      console.log('loggedUser')
+      console.log(loggedUser)
+      console.log('token')
+      console.log(token)
       setIsLoadingSpinner(false)
-      props.onDelete(props.id)
+      props.onDelete(props.id) // Goes all the way to the top to filter deleted place out of array
       setOpenSnackbar(true);
     } catch (error) {
       setIsLoadingSpinner(false)
