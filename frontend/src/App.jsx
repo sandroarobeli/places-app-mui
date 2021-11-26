@@ -49,8 +49,6 @@ const Main = (props) => {
   // SIGNING-UP) and if so, restore the user's privileges
   useEffect(() => {
     const storedData = JSON.parse(localStorage.getItem('userData'))
-    console.log('StoredData useEffect')// test
-    console.log(storedData)// test      
     
     if (storedData && storedData.token) {
       // If storedData exists & it has token property, we dispatch loginUser to redux store

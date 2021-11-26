@@ -31,9 +31,7 @@ const signup = async (req, res, next) => {
     // If returned errors object isn't empty, error is passed down the chain via next() 
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
-        console.log('BACKEND ERRORS:')
-        console.log(errors.errors)//test
-        return next(new HttpError('Invalid inputs entered. Please check your data', 422)) 
+       return next(new HttpError('Invalid inputs entered. Please check your data', 422)) 
     }
 
     // Getting manually entered properties from the user request
@@ -66,8 +64,6 @@ const signup = async (req, res, next) => {
     })
     // THIS TRY-CATCH ENSURES PROPER NETWORK PROTOCOL EXCHANGE
     try {
-        console.log('req.file') // test
-        console.log(req.file) // test
         // Change image name in uploads/images dir to exactly how I create it in database!!!.
         fs.rename(req.file.path, req.file.path + '.' + req.file.mimetype.match(/\/([\s\S]*)$/)[1], (error) => {
             if (error) {

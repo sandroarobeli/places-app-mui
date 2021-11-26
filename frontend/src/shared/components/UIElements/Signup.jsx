@@ -35,8 +35,6 @@ const Signup = (props) => {
   const [backendError, setBackendError] = useState('')
   
   // From redux
-  const loggedUser = useSelector(selectId)
-  const token = useSelector(selectToken)
   const dispatch = useDispatch()
     
   const initialFormState = {
@@ -70,14 +68,11 @@ const Signup = (props) => {
       if (!response.ok) {
         throw new Error(responseData.message)    
       }
-      console.log('ResponseData:') // testing ImageUpload
-      console.log(responseData)
       actions.resetForm(initialFormState);  // actions.setSubmitting(false) not needed with async
       dispatch(loginUser({
         userId: responseData.userId,
         token: responseData.token
       }))
-
       // Invokes setLocalStorage function 
       setLocalStorage(responseData.userId, responseData.token)
     } catch (error) {
@@ -87,7 +82,6 @@ const Signup = (props) => {
     }
   }
    
- 
   // Closes Error Modal
   const handleErrorModalClose = () => {
     setOpenErrorModal(false)

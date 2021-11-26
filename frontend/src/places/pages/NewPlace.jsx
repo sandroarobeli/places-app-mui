@@ -64,19 +64,12 @@ const NewPlace = () => {
                 headers: {
                     'Authorization': 'Bearer ' + token,
                 },
-                // mode: 'cors',
                 body: formData
             })
             const responseData = await response.json()
             if (!response.ok) {
                 throw new Error(responseData.message)    
             }
-            console.log('ResponseData:') // testing ImageUpload
-            console.log(responseData)
-            console.log('loggedUser')
-            console.log(loggedUser)
-            console.log('token')
-            console.log(token)
             setOpenSnackbar(true);
             actions.resetForm(initialFormState);  // actions.setSubmitting(false) not needed with async
             history.push('/')

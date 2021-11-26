@@ -26,8 +26,6 @@ const validationSchema = object({
       .required("Enter a valid password")
 });
 
-// TESTING TESTING TESTING...
-
 
 const Login = () => {
   const history = useHistory() 
@@ -70,11 +68,7 @@ const Login = () => {
       if (!response.ok) {
         throw new Error(responseData.message)
       }
-      console.log('responseData:')
-      console.log(responseData) // test
       actions.resetForm(initialFormState);  // actions.setSubmitting(false) not needed with async
-    //  dispatch(loginUser(responseData.userId))
-      //test start
       dispatch(loginUser({
         userId: responseData.userId,
         token: responseData.token,
@@ -82,13 +76,7 @@ const Login = () => {
 
       // Invokes setLocalStorage function 
       setLocalStorage(responseData.userId, responseData.token)
-      
-      // console.log('loggedUser')
-      // console.log(loggedUser)
-      // console.log('token')
-      // console.log(token)
-      // test end
-      history.push(`/${loggedUser}/places`) // test
+      history.push(`/${loggedUser}/places`) 
     } catch (error) {
       // errors ans setErrors for Formik have to do with frontend Form validation, not backend!
       // Thats why backend errors are handled as a separate state variable here  

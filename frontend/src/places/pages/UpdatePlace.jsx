@@ -53,7 +53,6 @@ const UpdatePlace = () => {
         if (!response.ok) {
           throw new Error(responseData.message)    
         }
-        console.log(responseData.place) //test
         setIsLoadingSpinner(false)
         setInitialFormState({ title: responseData.place.title, description: responseData.place.description, address: responseData.place.address })
       } catch (error) {
@@ -86,12 +85,6 @@ const UpdatePlace = () => {
       if (!response.ok) {
         throw new Error(responseData.message)    
       }
-      console.log('responseData')
-      console.log(responseData)
-      console.log('loggedUser')
-      console.log(loggedUser)
-      console.log('token')
-      console.log(token)
       setOpenSnackbar(true);
      // setInitialFormState({ title: '', description: '', address: ''})
       //actions.resetForm(initialFormState);  // actions.setSubmitting(false) not needed with async

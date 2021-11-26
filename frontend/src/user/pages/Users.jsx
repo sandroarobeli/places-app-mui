@@ -26,9 +26,6 @@ const Users = () => {
         if (!response.ok) {
           throw new Error(responseData.message)    
         }
-        console.log('Current users ID: ')
-        console.log(loggedUser) // test reads from response
-        console.log(responseData.users)
         setIsLoading(false)
         setLoadedUsers(responseData.users)
       } catch (error) {

@@ -73,8 +73,7 @@ const createPlace = async (req, res, next) => {
     // THIS TRY-CATCH ENSURES PROCESSING OF INPUT PROPERTIES 
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
-        console.log(errors.errors)//test
-        return next(new HttpError('Invalid inputs entered. Please check your data', 422)) 
+       return next(new HttpError('Invalid inputs entered. Please check your data', 422)) 
     }
 
     // Getting manually entered properties from the user request  
@@ -98,7 +97,7 @@ const createPlace = async (req, res, next) => {
         location: coordinates,
         creator: creator     
     })
-    console.log(creator) // test
+    
     // This block ensures that only existing user can create a new place
     let user
     try {
@@ -112,10 +111,6 @@ const createPlace = async (req, res, next) => {
 
     // THIS TRY-CATCH ENSURES PROPER NETWORK PROTOCOL EXCHANGE
     try {
-        
-        console.log('req.file') // test
-        console.log(req.file) // test
-        
         // Change image name in uploads/images dir to exactly how I create it in database!!!.
         fs.rename(req.file.path, req.file.path + '.' + req.file.mimetype.match(/\/([\s\S]*)$/)[1], (error) => {
             if (error) {
@@ -148,10 +143,8 @@ const updatePlaceById = async (req, res, next) => {
     // If returned errors object isn't empty, error is passed down the chain via next() 
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
-        console.log(errors.errors)//test
-        return next(new HttpError('Invalid inputs entered. Please check your data', 422)) 
+       return next(new HttpError('Invalid inputs entered. Please check your data', 422)) 
     }
-    
     
     const placeId = req.params.placeId
     const { title, description } = req.body
@@ -165,8 +158,6 @@ const updatePlaceById = async (req, res, next) => {
         }
         // Once found, we make sure (here, on backend) that ONLY whomever created This
         // Place MAY update it as well!
-        console.log('updatedPlace: ')// test
-        console.log(updatedPlace) // test
         if (updatedPlace.creator.toString() !== req.userData.userId) {
             // updatedPlace.creator --> WHO CREATED THIS PLACE
             // req.userData.userId --> WHO IS CURRENTLY LOGGED IN
@@ -195,8 +186,6 @@ const deletePlaceById = async (req, res, next) => {
         if (!deletedPlace) {
             return next(new Error(`Place could not be found`, 404))
         }
-        console.log('deletedPlace: ') // test
-        console.log(deletedPlace.creator._id)// test
         // Once found, we make sure (here, on backend) that ONLY whomever created This
         // Place MAY delete it as well! NOTE: since 'creator' is populated, it's
         // displayed a full object with all the User props for creator. Hence,

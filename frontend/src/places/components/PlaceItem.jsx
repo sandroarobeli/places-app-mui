@@ -80,11 +80,6 @@ const PlaceItem = (props) => {
       if (!response.ok) {
         throw new Error(responseData.message)
       }
-      console.log(`${props.title} has been deleted!`); //test
-      console.log('loggedUser')
-      console.log(loggedUser)
-      console.log('token')
-      console.log(token)
       setIsLoadingSpinner(false)
       props.onDelete(props.id) // Goes all the way to the top to filter deleted place out of array
       setOpenSnackbar(true);
