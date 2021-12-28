@@ -12,15 +12,13 @@ dotenv.config();
 // Token initialization
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN
 
-
 const Map = (props) => {
     const mapContainer = useRef(null);
     const map = useRef(null);
     const [longitude, setLongitude] = useState(props.center.lng);
     const [latitude, setLatitude] = useState(props.center.lat);
     const [zoom, setZoom] = useState(props.zoom);
-    
-    
+
     useEffect(() => {
         if (map.current) return; // initialize map only once
         map.current = new mapboxgl.Map({
@@ -44,9 +42,9 @@ const Map = (props) => {
         console.log(process.env.NODE_ENV)  // KEEP IN MIND!!!
         // Create a default Marker and add it to the map.
         const marker = new mapboxgl.Marker({ color: "red" })
-            .setLngLat([longitude, latitude]) 
+            .setLngLat([longitude, latitude])
             .addTo(map.current);
-        
+
     }, [longitude, latitude, zoom]);
 
     useEffect(() => {
@@ -58,7 +56,6 @@ const Map = (props) => {
         });
     });
 
-    
     return (
         <React.Fragment>
             <div
@@ -89,4 +86,4 @@ const Map = (props) => {
     );
 }
 
-export default Map
+export default Map;

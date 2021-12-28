@@ -1,4 +1,3 @@
-// Third party imports
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useSelector } from 'react-redux'
@@ -9,7 +8,6 @@ import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import LinearProgress from "@mui/material/LinearProgress";
 
-// Custom imports
 import TextField from '../../shared/components/UIElements/TextField'
 import Button from '../../shared/components/UIElements/Button'
 import Snackbar from '../../shared/components/UIElements/Snackbar'
@@ -25,8 +23,6 @@ const validationSchema = object({
     address: string().required("Address required"),
     image: mixed().required()
 })
-
-
 
 const NewPlace = () => {
     // State management
@@ -46,20 +42,20 @@ const NewPlace = () => {
         address: "",
         image: null
     }
-    
+
     // Handler functions
     // Submits data to the server
     const submitHandler = async (values, actions) => {
         try {
             let formData = new FormData()
             //  Data inputs via formData (values)
-            formData.append('title', values.title) 
+            formData.append('title', values.title)
             formData.append('description', values.description)
             formData.append('address', values.address)
             formData.append('creator', loggedUser)
             formData.append('image', values.image)
             // Data inputs using formData (values)
-            const response = await fetch('http://127.0.0.1:5000/api/places/', {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/places/`, {
                 method: 'POST',
                 headers: {
                     'Authorization': 'Bearer ' + token,
@@ -68,18 +64,17 @@ const NewPlace = () => {
             })
             const responseData = await response.json()
             if (!response.ok) {
-                throw new Error(responseData.message)    
+                throw new Error(responseData.message)
             }
             setOpenSnackbar(true);
             actions.resetForm(initialFormState);  // actions.setSubmitting(false) not needed with async
             history.push('/')
         } catch (error) {
             // errors ans setErrors for Formik have to do with frontend Form validation, not backend!
-            // Thats why backend errors are handled as a separate state variable here  
+            // Thats why backend errors are handled as a separate state variable here
             setBackendError(error.message)
         }
     }
-
 
     // Manages snackbar
     const handleSnackbarClose = (event, reason) => {
@@ -93,7 +88,7 @@ const NewPlace = () => {
     const handleErrorModalClose = () => {
         setOpenErrorModal(false)
         setBackendError('')
-    }  
+    }
 
     return (
         <Container
@@ -239,8 +234,7 @@ const NewPlace = () => {
                 }
             </Formik>
         </Container>
-    ) 
-   
+    )
 };
-  
-  export default NewPlace;
+
+export default NewPlace;

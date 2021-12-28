@@ -1,8 +1,6 @@
-// Third party modules
 const express = require('express')
 const { check } = require('express-validator')
 
-// Custom modules
 const usersControllers = require('../controllers/users-controller')
 const fileUpload = require('../middleware/file-upload')
 
@@ -25,7 +23,7 @@ router.post(
             .isEmail(),
         check('password')
             .isLength({ min: 8 })
-    ], 
+    ],
     usersControllers.signup
 )
 

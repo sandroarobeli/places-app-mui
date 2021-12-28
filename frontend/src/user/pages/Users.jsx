@@ -1,11 +1,8 @@
-// Third party imports
 import React, { useEffect, useState } from "react";
-import { useSelector } from 'react-redux' 
-// Custom imports
+
 import UsersList from "../components/UsersList";
 import ErrorModal from '../../shared/components/UIElements/ErrorModal'
 import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner'
-import { selectId } from '../../store/loginSlice'   
 
 const Users = () => {
   // State management
@@ -14,17 +11,14 @@ const Users = () => {
   const [isLoading, setIsLoading] = useState(false) // Redux will handle this if used
   const [loadedUsers, setLoadedUsers] = useState([])
 
-  // From Redux
-  const loggedUser = useSelector(selectId)
-
   useEffect(() => {
     const sendRequest = async () => {
       setIsLoading(true)
       try {
-        const response = await fetch('http://127.0.0.1:5000/api/users/')
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/users/`)
         const responseData = await response.json()
         if (!response.ok) {
-          throw new Error(responseData.message)    
+          throw new Error(responseData.message)
         }
         setIsLoading(false)
         setLoadedUsers(responseData.users)
@@ -35,15 +29,14 @@ const Users = () => {
     }
 
     sendRequest()
-    
-  }, [])
+}, [])
 
   // Handler functions
   // Closes Error Modal
   const handleErrorModalClose = () => {
     setOpenErrorModal(false)
     setBackendError('')
-  } 
+  }
 
   return (
     <React.Fragment>
@@ -65,8 +58,5 @@ const Users = () => {
     </React.Fragment>
     );
 };
-  
+
 export default Users;
-  
-
-

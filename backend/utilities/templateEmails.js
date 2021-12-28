@@ -1,13 +1,10 @@
-// Third party modules
 const sgMail = require('@sendgrid/mail')
 require("dotenv").config();
 
-// Custom modules
 const HttpError = require('../models/http-error')
 
 // Initializing sendGridMail object with API Key
 sgMail.setApiKey(process.env.SENDGRID_API_KEY)
-
 
 // Generate welcome email upon creating a new user
 const sendWelcomeEmail = (name, email) => {
@@ -15,10 +12,9 @@ const sendWelcomeEmail = (name, email) => {
             to: email,
             from: 'sandroarobelibusiness@gmail.com',
             subject: `Welcome to Places App ${name}`,
-            text: `Welcome to Places App ${name}\nUsing this app, you can add, edit and remove places you find memorable.\nEnjoy!\nPlaces-App team`  
+            text: `Welcome to Places App ${name}\nUsing this app, you can add, edit and remove places you find memorable.\nEnjoy!\nPlaces-App team`
     }).then(() => console.log(`Email to ${name} has been sent`)).catch((error) => new HttpError(`Email sending failed: ${error.message}`, 500))
 }
-
 
 // Generate follow up email upon deleting a user
 const sendPartingEmail = (name, email) => {
@@ -31,4 +27,4 @@ const sendPartingEmail = (name, email) => {
 }
 
 exports.sendWelcomeEmail = sendWelcomeEmail
-exports.sendPartingEmail = sendPartingEmail
+exports.sendPartingEmail = sendPartingEmail;

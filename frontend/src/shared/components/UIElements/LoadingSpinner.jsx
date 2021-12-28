@@ -15,11 +15,11 @@ const LoadingSpinner = (props) => {
                 alignItems: "center",
                 zIndex: 99
             }}
-        >   
+        >
             {header}
             <CircularProgress size={props.size} thickness={props.thickness} sx={{ color: props.color }} />  {/* "#f8df00" */}
         </Box>
     )
 }
 
-export default LoadingSpinner
+export default LoadingSpinner;

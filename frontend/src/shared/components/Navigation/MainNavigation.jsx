@@ -1,4 +1,3 @@
-// Third party imports
 import React, { useState } from "react";
 import { useSelector, useDispatch } from 'react-redux'
 import { Link } from "react-router-dom";
@@ -10,14 +9,10 @@ import Tab from '@mui/material/Tab';
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 
-// Custom imports
 import SideDrawer from "./SideDrawer";
 import { logoutUser, selectLogin, selectId } from '../../../store/loginSlice'
 
-
-
 const LinkTab = props => {
-  
   return (
     <Tab
       component={Link}
@@ -41,7 +36,6 @@ const LinkTab = props => {
   )
 }
 
-
 const MainNavigation = () => {
   // From Redux
   const loggedIn = useSelector(selectLogin)
@@ -51,17 +45,20 @@ const MainNavigation = () => {
   // State management
   const [tabValue, setTabValue] = useState(0)
   const [drawerOpen, setDrawerOpen] = useState(false)
-  
+
   // Handler functions
   const handleChange = (event, newValue) => {
     setTabValue(newValue)
   }
+
   const handleDrawerOpen = () => {
     setDrawerOpen(true);
   };
+
   const handleDrawerClose = () => {
     setDrawerOpen(false);
   };
+
   const handleLogout = () => {
     dispatch(logoutUser())
     // As we log out, we ensure to clear the localStorage
@@ -69,8 +66,7 @@ const MainNavigation = () => {
     setDrawerOpen(false);
   }
 
-   
-    return (
+  return (
       <AppBar position='static' color='secondary' sx={{height: '5rem'}} >
         <Toolbar sx={{justifyContent: 'space-between', alignItems:'center'}}>
           <IconButton
@@ -105,7 +101,7 @@ const MainNavigation = () => {
             textColor='white'
             indicatorColor='primary'
             sx={{
-              backgroundColor: 'primary',          
+              backgroundColor: 'primary',
               width: {
                 tablet: '60%',
                 laptop: '40%'
@@ -133,8 +129,6 @@ const MainNavigation = () => {
         </Toolbar>
       </AppBar>
     );
- };
-  
-export default MainNavigation;
-  
+};
 
+export default MainNavigation;

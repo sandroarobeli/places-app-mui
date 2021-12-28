@@ -1,4 +1,4 @@
-// MapModal is customized from original MUI dialog 
+// MapModal is customized from original MUI dialog
 // Third party imports
 import React from "react";
 import Button from '@mui/material/Button'
@@ -8,9 +8,7 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
 import Typography from '@mui/material/Typography'
 
-// Custom imports
 import Map from './Map'
-
 
 const MapModal = (props) => {
   return (
@@ -40,7 +38,7 @@ const MapModal = (props) => {
               },
               "& h2": {
                 margin: {
-                  tablet: "0.5rem" 
+                  tablet: "0.5rem"
                 }
               }
             }}
@@ -76,8 +74,6 @@ const MapModal = (props) => {
         </Dialog>
       </React.Fragment>
     );
-  };
-  
-export default MapModal;
-  
+};
 
+export default MapModal;

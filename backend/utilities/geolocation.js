@@ -1,10 +1,7 @@
-// Third party modules
 const axios = require('axios')
 require("dotenv").config();
 
-// Custom modules
 const HttpError = require('../models/http-error')
-
 
 const getCoordinates = async (address) => {
     try {
@@ -16,14 +13,14 @@ const getCoordinates = async (address) => {
             lat: coordinates[1]
         }
     } catch (error) {
-        const errorMessage = error.response //.data 
-            ? error.response.data.message 
+        const errorMessage = error.response //.data
+            ? error.response.data.message
             : 'Could not find location for the address entered. Please check the address and enter it again'
-        const errorStatus = error.response 
+        const errorStatus = error.response
             ? error.response.status
-            : 500   
+            : 500
         throw new HttpError(errorMessage, errorStatus)
     }
 }
 
-module.exports = getCoordinates
+module.exports = getCoordinates;

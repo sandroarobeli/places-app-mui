@@ -1,4 +1,3 @@
-// Third party imports
 import React from 'react'
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
@@ -18,4 +17,4 @@ const SnackbarWrapper = (props) => {
     )
 }
 
-export default SnackbarWrapper
+export default SnackbarWrapper;

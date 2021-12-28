@@ -1,13 +1,8 @@
-// Third party imports
 import React from 'react'
 import Card from "@mui/material/Card";
 
-// Custom imports
-// None - This field intentionally left empty
-
-
 const CustomCard = props => {
-    
+
     // MUI-Card Components' own attributes. Plus functions
     const configCard = {
         variant: "outlined",
@@ -18,13 +13,12 @@ const CustomCard = props => {
             minWidth: "150px",
         }
     };
-    
+
     return (
         <Card {...configCard} sx={props.sx}>
             {props.children}
         </Card>
     )
-  }
-  
-  export default CustomCard
+}
 
+export default CustomCard

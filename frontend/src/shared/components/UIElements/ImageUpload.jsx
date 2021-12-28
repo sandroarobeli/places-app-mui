@@ -1,4 +1,3 @@
-// Third party imports
 import React, { useState, useEffect } from 'react'
 import Button from '@mui/material/Button';
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
@@ -30,9 +29,9 @@ const AvatarWrapper = (props) => {
                 padding: '0.25rem',
                 marginBottom: '0.75rem',
                 backgroundColor: 'white',
-                color: '#f50057',      
-                width: props.width,      
-                height: props.height  
+                color: '#f50057',
+                width: props.width,
+                height: props.height
             }}
         />
     )
@@ -49,7 +48,7 @@ const ImageUpload = (props) => {
                     type='file'
                     style={{ display: 'none' }}
                     multiple
-                    onChange={props.handleImageUpload}  
+                    onChange={props.handleImageUpload}
                 />
                 <AvatarWrapper image={props.image} width={props.width} height={props.height}/>   {/* image={values.image} goes to Formik  */}
                 <Button
@@ -67,4 +66,3 @@ const ImageUpload = (props) => {
 }
 
 export default ImageUpload
-

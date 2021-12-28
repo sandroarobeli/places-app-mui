@@ -1,9 +1,7 @@
-// Third party imports
 import React, { useState } from "react";
 import Container from "@mui/material/Container";
 import Button from '@mui/material/Button'
 
-// Custom imports
 import Login from '../../shared/components/UIElements/Login'
 import Signup from "../../shared/components/UIElements/Signup";
 
@@ -53,6 +51,5 @@ const Authenticate = () => {
         </Container>
     );
 };
-  
+
 export default Authenticate;
-  

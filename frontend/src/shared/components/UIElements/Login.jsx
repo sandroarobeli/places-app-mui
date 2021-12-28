@@ -1,6 +1,5 @@
-// Third party imports
 import React, { useState } from "react";
-import { useHistory } from 'react-router-dom' 
+import { useHistory } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { Formik, Form } from "formik";
 import { object, string } from "yup";
@@ -9,13 +8,10 @@ import Divider from '@mui/material/Divider';
 import Typography from "@mui/material/Typography";
 import LinearProgress from "@mui/material/LinearProgress";
 
-// Custom imports
 import TextField from './TextField'
 import Button from './Button'
 import ErrorModal from "./ErrorModal";
 import { loginUser, selectId, selectToken } from '../../../store/loginSlice'
-
-
 
 // ValidationSchema
 const validationSchema = object({
@@ -26,13 +22,13 @@ const validationSchema = object({
       .required("Enter a valid password")
 });
 
-
 const Login = () => {
-  const history = useHistory() 
+  const history = useHistory()
+
   // State management
   const [openErrorModal, setOpenErrorModal] = useState(false)
   const [backendError, setBackendError] = useState('')
-  
+
   // From redux
   const loggedUser = useSelector(selectId)
   const token = useSelector(selectToken)
@@ -44,16 +40,15 @@ const Login = () => {
   }
 
   // Handler functions
-  // Saves userId & token into localStorage, ensures surviving page reloads 
+  // Saves userId & token into localStorage, ensures surviving page reloads
   const setLocalStorage = (userId, token) => {
     localStorage.setItem('userData', JSON.stringify({ userId: userId, token: token }))
   }
 
-  
   // Submits data to the server
   const submitHandler = async (values, actions) => {
     try {
-      const response = await fetch('http://127.0.0.1:5000/api/users/login', {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/users/login`, {
         method: 'POST',
         headers: {
           'Content-type': 'application/json',
@@ -62,28 +57,29 @@ const Login = () => {
         body: JSON.stringify({  // body has to be in JSON format!
           email: values.email,
           password: values.password
-        })   
+        })
       })
       const responseData = await response.json()
       if (!response.ok) {
         throw new Error(responseData.message)
       }
+
       actions.resetForm(initialFormState);  // actions.setSubmitting(false) not needed with async
       dispatch(loginUser({
         userId: responseData.userId,
         token: responseData.token,
       }))
 
-      // Invokes setLocalStorage function 
+      // Invokes setLocalStorage function
       setLocalStorage(responseData.userId, responseData.token)
-      history.push(`/${loggedUser}/places`) 
+      history.push(`/${loggedUser}/places`)
     } catch (error) {
       // errors ans setErrors for Formik have to do with frontend Form validation, not backend!
-      // Thats why backend errors are handled as a separate state variable here  
+      // Thats why backend errors are handled as a separate state variable here
       setBackendError(error.message)
     }
   }
-  
+
   // Closes Error Modal
   const handleErrorModalClose = () => {
     setOpenErrorModal(false)
@@ -190,5 +186,5 @@ const Login = () => {
     </Formik>
   );
 };
-  
+
 export default Login;

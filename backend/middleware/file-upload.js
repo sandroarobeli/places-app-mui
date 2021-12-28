@@ -1,7 +1,7 @@
 const multer = require('multer')
 
 const MIME_TYPE_MAP = {
-    'image/png': 'png',    
+    'image/png': 'png',
     'image/jpeg': 'jpeg',
     'image/jpg': 'jpg'
 }
@@ -16,10 +16,9 @@ const fileUpload = multer({
     }),
     fileFilter: (req, file, callback) => {
         const isValid = !!MIME_TYPE_MAP[file.mimetype]  // convert undefined to false or true
-        let error = isValid ? null : new Error('Invalid image format') // if format isn't 
+        let error = isValid ? null : new Error('Invalid image format') // if format isn't
         callback(error, isValid)              // png jpeg or jpg, callback throws an error
     }
 })
 
- 
-module.exports = fileUpload
+module.exports = fileUpload;

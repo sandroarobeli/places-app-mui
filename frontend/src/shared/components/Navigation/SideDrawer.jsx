@@ -1,4 +1,3 @@
-// Third party imports
 import React from "react"
 import { useSelector } from 'react-redux'
 import { Link } from "react-router-dom";
@@ -6,9 +5,7 @@ import Drawer from '@mui/material/Drawer'
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 
-// Custom imports
 import { selectLogin, selectId } from '../../../store/loginSlice'
-
 
 const LinkTab = (props) => {
   return (
@@ -32,7 +29,7 @@ const SideDrawer = (props) => {
   // From Redux
   const loggedIn = useSelector(selectLogin)
   const loggedUser = useSelector(selectId)
-  
+
   return (
     <React.Fragment>
       <Drawer
@@ -47,7 +44,7 @@ const SideDrawer = (props) => {
           value={props.value}
           onChange={props.onChange}
           textColor="white"
-          indicatorColor="primary" 
+          indicatorColor="primary"
           sx={{ width: "20rem" }}
         >
           <LinkTab label='all users' to='/' onClick={props.onClose} />
@@ -60,6 +57,5 @@ const SideDrawer = (props) => {
     </React.Fragment>
   )
 };
-  
+
 export default SideDrawer;
-  

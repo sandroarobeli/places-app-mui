@@ -1,14 +1,11 @@
-// Third party imports
 import React from 'react'
 import { Link } from 'react-router-dom'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 import Grid from "@mui/material/Grid";
 
-// Custom imports
 import CustomCard from "../../shared/components/UIElements/CustomCard";
 import PlaceItem from "./PlaceItem";
-
 
 const PlaceList = (props) => {
     if (props.items.length === 0) {
@@ -71,8 +68,6 @@ const PlaceList = (props) => {
             }
         </Grid>
     )
-  
-  };
-  
-  export default PlaceList;
+};
 
+export default PlaceList;

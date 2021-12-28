@@ -1,8 +1,6 @@
-// Third parti imports
 const jwt  = require('jsonwebtoken')
 require("dotenv").config();
 
-// Custom imports
 const HttpError = require('../models/http-error')
 
 // This middleware function checks if we have a token and if so,
@@ -13,7 +11,7 @@ module.exports = (req, res, next) => {
     }
     try {
         const token = req.headers.authorization.split(' ')[1] // Format -> authorization: 'Bearer TOKEN'
-        // There is NO token object received with request.header 
+        // There is NO token object received with request.header
         if (!token) {
             throw new Error('Authentication failed') // redundancy measure. catch below does it too
         }
@@ -27,9 +25,4 @@ module.exports = (req, res, next) => {
         // General catch
         return next(new HttpError(`Authentication failed\n${error.message}`, 403))
     }
-    
-    
-    
-    
-
-}
+};

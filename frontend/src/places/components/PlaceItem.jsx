@@ -1,4 +1,3 @@
-// Third party imports
 import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
 import { Link } from "react-router-dom"
@@ -12,16 +11,12 @@ import Button from '@mui/material/Button'
 import Grid from "@mui/material/Grid";
 import Avatar from '@mui/material/Avatar'
 
-
-// Custom imports
 import MapModal from "../../shared/components/UIElements/MapModal";
 import DeleteModal from "../../shared/components/UIElements/DeleteModal";
 import Snackbar from '../../shared/components/UIElements/Snackbar'
 import ErrorModal from '../../shared/components/UIElements/ErrorModal'
 import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner'
 import { selectId, selectToken } from '../../store/loginSlice'
-
-
 
 const PlaceItem = (props) => {
   // From Redux
@@ -69,7 +64,7 @@ const PlaceItem = (props) => {
     setOpenDeleteModal(false);
     setIsLoadingSpinner(true)
     try {
-      const response = await fetch(`http://127.0.0.1:5000/api/places/${props.id}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/places/${props.id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': 'Bearer ' + token
@@ -123,7 +118,7 @@ const PlaceItem = (props) => {
             () =>
               <Avatar
                 variant='square'
-                src={`http://127.0.0.1:5000/${props.image}`}  
+                src={`${process.env.REACT_APP_ASSET_URL}/${props.image}`}
                 alt={props.title}
                 title={props.title}
                 sx={{
@@ -269,8 +264,5 @@ const PlaceItem = (props) => {
     </Grid>
   )
 };
-  
+
 export default PlaceItem;
-  
-
-

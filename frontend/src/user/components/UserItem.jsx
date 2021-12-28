@@ -1,4 +1,3 @@
-// Third party imports
 import React from "react";
 import { Link } from "react-router-dom";
 import Typography from '@mui/material/Typography'
@@ -8,14 +7,8 @@ import CardMedia from '@mui/material/CardMedia'
 import Card from '@mui/material/Card'
 import Avatar from '@mui/material/Avatar'
 
-
-// Custom imports
-// Intentionally left blank
-
-
-
 const UserItem = (props) => {
- return (
+  return (
    <Grid item mobile={12} tablet={6} laptop={4}>
     <Link to={`/${props.id}/places`} style={{textDecoration: 'none'}}>
       <Card
@@ -26,7 +19,7 @@ const UserItem = (props) => {
           background: "#292929",
           display: 'flex',
           "&:hover": {
-            background: "#ffd900" 
+            background: "#ffd900"
           },
           "&:hover h2": {
             color: "#292929"
@@ -40,13 +33,13 @@ const UserItem = (props) => {
            component={
              () =>
                <Avatar
-                 src={`http://127.0.0.1:5000/${props.image}`}  
+                 src={`${process.env.REACT_APP_ASSET_URL}/${props.image}`}
                  alt={props.name}
                  title={props.name}
                  sx={{width: '6rem', height: '6rem', margin: 'auto 5px'}}
                />
               }
-             
+
       />
         <CardContent>
           <Typography
@@ -59,17 +52,16 @@ const UserItem = (props) => {
           <Typography
             variant='h5'
             component='h3'
-            sx={{color: "white"}}  
+            sx={{color: "white"}}
           >
             {props.placeCount} {props.placeCount === 1 ? "Place" : "Places"}
           </Typography>
         </CardContent>
       </Card>
-     
+
     </Link>
   </Grid>
   );
 };
 
 export default UserItem;
-

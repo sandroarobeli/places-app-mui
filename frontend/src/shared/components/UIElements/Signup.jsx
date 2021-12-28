@@ -1,6 +1,5 @@
-// Third party imports
 import React, { useState } from "react";
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { Formik, Form } from "formik";
 import { object, string, mixed } from "yup";
 import Grid from "@mui/material/Grid";
@@ -8,13 +7,11 @@ import Divider from '@mui/material/Divider';
 import Typography from "@mui/material/Typography";
 import LinearProgress from "@mui/material/LinearProgress";
 
-// Custom imports
 import TextField from './TextField'
 import Button from './Button'
 import ErrorModal from './ErrorModal'
 import ImageUpload from './ImageUpload'
-import { loginUser, selectId, selectToken } from '../../../store/loginSlice'
-
+import { loginUser } from '../../../store/loginSlice'
 
 // ValidationSchema
 const validationSchema = object({
@@ -25,18 +22,17 @@ const validationSchema = object({
       .matches(/^(?:(?!password).)*$/gi, "Cannot contain the word 'password'")
       .required("Enter a valid password"),
     image: mixed().required()
-     
-});
 
+});
 
 const Signup = (props) => {
   // State management
   const [openErrorModal, setOpenErrorModal] = useState(false)
   const [backendError, setBackendError] = useState('')
-  
+
   // From redux
   const dispatch = useDispatch()
-    
+
   const initialFormState = {
     name: "",
     email: "",
@@ -45,7 +41,7 @@ const Signup = (props) => {
   }
 
   // Handler functions
-  // Saves userId & token into localStorage, ensures surviving page reloads 
+  // Saves userId & token into localStorage, ensures surviving page reloads
   const setLocalStorage = (userId, token) => {
     localStorage.setItem('userData', JSON.stringify({ userId: userId, token: token }))
   }
@@ -55,38 +51,40 @@ const Signup = (props) => {
     try {
       let formData = new FormData()
       //  Data inputs via formData (values)
-      formData.append('name', values.name) 
+      formData.append('name', values.name)
       formData.append('email', values.email)
       formData.append('password', values.password)
-      formData.append('image', values.image) 
+      formData.append('image', values.image)
+
       // Data inputs using formData (values)
-      const response = await fetch('http://127.0.0.1:5000/api/users/signup', {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/users/signup`, {
         method: 'POST',
         body: formData
       })
       const responseData = await response.json()
       if (!response.ok) {
-        throw new Error(responseData.message)    
+        throw new Error(responseData.message)
       }
+
       actions.resetForm(initialFormState);  // actions.setSubmitting(false) not needed with async
       dispatch(loginUser({
         userId: responseData.userId,
         token: responseData.token
       }))
-      // Invokes setLocalStorage function 
+      // Invokes setLocalStorage function
       setLocalStorage(responseData.userId, responseData.token)
     } catch (error) {
       // errors ans setErrors for Formik have to do with frontend Form validation, not backend!
-      // Thats why backend errors are handled as a separate state variable here  
-      setBackendError(error.message)  
+      // Thats why backend errors are handled as a separate state variable here
+      setBackendError(error.message)
     }
   }
-   
+
   // Closes Error Modal
   const handleErrorModalClose = () => {
     setOpenErrorModal(false)
     setBackendError('')
-  }  
+  }
 
   return (
     <Formik
@@ -218,5 +216,5 @@ const Signup = (props) => {
     </Formik>
   );
 };
-  
+
 export default Signup;

@@ -1,4 +1,3 @@
-// Third party imports
 import React from 'react'
 import TextField from "@mui/material/TextField";
 import { useField } from "formik";
@@ -22,4 +21,4 @@ const TextFieldWrapper = ({ name, ...otherProps }) => {
     return <TextField {...configTextField} />
 }
 
-export default TextFieldWrapper
+export default TextFieldWrapper;

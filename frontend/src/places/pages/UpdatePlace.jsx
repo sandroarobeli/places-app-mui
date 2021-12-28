@@ -1,4 +1,3 @@
-// Third party imports
 import React, { useState, useEffect } from 'react'
 import { useParams, useHistory } from 'react-router-dom'
 import { useSelector } from 'react-redux'
@@ -9,7 +8,6 @@ import Grid from "@mui/material/Grid";
 import Container from "@mui/material/Container";
 import LinearProgress from "@mui/material/LinearProgress";
 
-// Custom imports
 import TextField from '../../shared/components/UIElements/TextField'
 import Button from '../../shared/components/UIElements/Button'
 import Snackbar from '../../shared/components/UIElements/Snackbar'
@@ -32,26 +30,26 @@ const UpdatePlace = () => {
   const [backendError, setBackendError] = useState('')
   const [isLoadingSpinner, setIsLoadingSpinner] = useState(false) // Redux will handle this if used
   const [initialFormState, setInitialFormState] = useState({ title: '', description: '', address: ''})
-  
+
   // Access to the dynamic segments
   const placeId = useParams().placeId;
-  
+
   // From Redux
   const loggedUser = useSelector(selectId)
   const token = useSelector(selectToken)
 
   // History module
   const history = useHistory()
-  
+
   // Pre-loads title, description and address of the place to be edited
   useEffect(() => {
     const sendRequest = async () => {
       setIsLoadingSpinner(true)
       try {
-        const response = await fetch(`http://127.0.0.1:5000/api/places/${placeId}`)
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/places/${placeId}`)
         const responseData = await response.json()
         if (!response.ok) {
-          throw new Error(responseData.message)    
+          throw new Error(responseData.message)
         }
         setIsLoadingSpinner(false)
         setInitialFormState({ title: responseData.place.title, description: responseData.place.description, address: responseData.place.address })
@@ -63,13 +61,12 @@ const UpdatePlace = () => {
 
     sendRequest()
   },[placeId])
-  
-  
+
   // Handler functions
   // Submits data to the server
   const submitHandler = async (values, actions) => {
     try {
-      const response = await fetch(`http://127.0.0.1:5000/api/places/${placeId}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/places/${placeId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -83,7 +80,7 @@ const UpdatePlace = () => {
       })
       const responseData = await response.json()
       if (!response.ok) {
-        throw new Error(responseData.message)    
+        throw new Error(responseData.message)
       }
       setOpenSnackbar(true);
      // setInitialFormState({ title: '', description: '', address: ''})
@@ -91,12 +88,11 @@ const UpdatePlace = () => {
       history.push(`/${loggedUser}/places`)
     } catch (error) {
        // errors ans setErrors for Formik have to do with frontend Form validation, not backend!
-       // Thats why backend errors are handled as a separate state variable here  
+       // Thats why backend errors are handled as a separate state variable here
        setBackendError(error.message)
     }
   }
-  
-  
+
   // Manages snackbar
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -104,13 +100,13 @@ const UpdatePlace = () => {
     }
     setOpenSnackbar(false)
   }
-  
+
   // Closes Error Modal
   const handleErrorModalClose = () => {
     setOpenErrorModal(false)
     setBackendError('')
   }
-  
+
   return (
     <Container
       sx={{
@@ -140,7 +136,7 @@ const UpdatePlace = () => {
         initialValues={initialFormState}
         validationSchema={validationSchema}
         onSubmit={submitHandler}
-        enableReinitialize // allows pre-populating textFields upon component load 
+        enableReinitialize // allows pre-populating textFields upon component load
       >
         {
           ({ isSubmitting }) => (
@@ -256,6 +252,5 @@ const UpdatePlace = () => {
     </Container>
   )
 };
-  
+
 export default UpdatePlace;
-  

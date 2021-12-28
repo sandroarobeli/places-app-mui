@@ -1,14 +1,11 @@
-// Third party modules
 const mongoose = require('mongoose')
 const fs = require('fs')
 const { validationResult } = require('express-validator')
 
-// Custom modules
 const HttpError = require('../models/http-error')
 const getCoordinates = require('../utilities/geolocation')
 const Place = require('../models/place-model')
 const User = require('../models/user-model')
-const { findById } = require('../models/place-model')
 
 // List the place by its ID
 const getPlaceById  = async (req, res, next) => {
@@ -21,11 +18,11 @@ const getPlaceById  = async (req, res, next) => {
             return next(new HttpError(`Place not found`, 404))
         }
         // adds id property (in addition to _id) to the returned Object
-        res.status(200).json({ place: place.toObject({ getters: true }) }) 
+        res.status(200).json({ place: place.toObject({ getters: true }) })
     } catch (error) {
         return next(new HttpError(`Unable to retrieve Place: ${error.message}`, 500))
-    }    
-    
+    }
+
 }
 
 // List all places created by a given user // USE THIS CONTROLLER IN MUI VERSION
@@ -39,7 +36,7 @@ const getPlacesByUserId = async (req, res, next) => {
             // NOTE: NO ERROR NEEDED HERE, THIS IS NOT AN ERROR. SIMPLY NO PLACES EXIST
             //return next(new HttpError(`No places found for this user`, 404))
             console.log('No places found for this User')
-           
+
         }
         // adds id property (in addition to _id) to the returned Object(s)
         res.status(200).json({ places: places.map(place => place.toObject({ getters: true })) })
@@ -65,23 +62,22 @@ const getPlacesByUserId2 = async (req, res, next) => {
     }
 }
 
-
 // Create a new Place
 const createPlace = async (req, res, next) => {
     // Middleware registered in the routes gets invoked here
     // If returned errors object isn't empty, error is passed down the chain via next()
-    // THIS TRY-CATCH ENSURES PROCESSING OF INPUT PROPERTIES 
+    // THIS TRY-CATCH ENSURES PROCESSING OF INPUT PROPERTIES
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
-       return next(new HttpError('Invalid inputs entered. Please check your data', 422)) 
+       return next(new HttpError('Invalid inputs entered. Please check your data', 422))
     }
 
-    // Getting manually entered properties from the user request  
-    const { title, description, address, creator } = req.body // ADD image PROP HERE!!! 
-    
+    // Getting manually entered properties from the user request
+    const { title, description, address, creator } = req.body // ADD image PROP HERE!!!
+
     // Getting coordinates by using geocoding function
     // THIS TRY-CATCH ENSURES PROCESSING OF ADDRESS --> COORDINATES CONVERSION
-    let coordinates  
+    let coordinates
     try {
         coordinates = await getCoordinates(address)
     } catch (error) {
@@ -95,9 +91,9 @@ const createPlace = async (req, res, next) => {
         image: req.file.path +  '.' + req.file.mimetype.match(/\/([\s\S]*)$/)[1], // attaches extension
         address,
         location: coordinates,
-        creator: creator     
+        creator: creator
     })
-    
+
     // This block ensures that only existing user can create a new place
     let user
     try {
@@ -114,14 +110,14 @@ const createPlace = async (req, res, next) => {
         // Change image name in uploads/images dir to exactly how I create it in database!!!.
         fs.rename(req.file.path, req.file.path + '.' + req.file.mimetype.match(/\/([\s\S]*)$/)[1], (error) => {
             if (error) {
-                throw error;    
+                throw error;
             }
             console.log('Renaming complete!');
         })
-        // Transactions let you execute multiple operations 
+        // Transactions let you execute multiple operations
         // In isolation and potentially undo all the operations if one of them fails.
         const session = await mongoose.startSession()
-        
+
         // Begin Transaction
         session.startTransaction()
         await createdPlace.save({ session: session })
@@ -130,25 +126,25 @@ const createPlace = async (req, res, next) => {
         await session.commitTransaction()
         // End Transaction
 
-        res.status(201).json({ place: createdPlace.toObject({ getters: true }) })   
+        res.status(201).json({ place: createdPlace.toObject({ getters: true }) })
     } catch (error) {
         return next(new HttpError(`Creating Place failed: ${error.message}`, 500))
     }
-    
+
 }
 
 // Update place
 const updatePlaceById = async (req, res, next) => {
     // Middleware registered in the routes gets invoked here
-    // If returned errors object isn't empty, error is passed down the chain via next() 
+    // If returned errors object isn't empty, error is passed down the chain via next()
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
-       return next(new HttpError('Invalid inputs entered. Please check your data', 422)) 
+       return next(new HttpError('Invalid inputs entered. Please check your data', 422))
     }
-    
+
     const placeId = req.params.placeId
     const { title, description } = req.body
-    
+
     let updatedPlace
     try {
         updatedPlace = await Place.findById(placeId)
@@ -161,7 +157,7 @@ const updatePlaceById = async (req, res, next) => {
         if (updatedPlace.creator.toString() !== req.userData.userId) {
             // updatedPlace.creator --> WHO CREATED THIS PLACE
             // req.userData.userId --> WHO IS CURRENTLY LOGGED IN
-            return next(new HttpError(`You are not authorized to edit this place!`, 401))    
+            return next(new HttpError(`You are not authorized to edit this place!`, 401))
         }
         // Once verified, we allow the editing to proceed
         updatedPlace = await Place.findByIdAndUpdate(
@@ -169,7 +165,7 @@ const updatePlaceById = async (req, res, next) => {
             { title, description },
             { new: true }
         )
-        
+
         res.status(200).json({ place: updatedPlace.toObject({ getters: true }) })
     } catch (error) {
         return next(new HttpError(`Updating Place failed: ${error.message}`, 500))
@@ -182,7 +178,7 @@ const deletePlaceById = async (req, res, next) => {
     let deletedPlace
     try {
         // Makes full User object available via Place
-        deletedPlace = await Place.findById(placeId).populate('creator') 
+        deletedPlace = await Place.findById(placeId).populate('creator')
         if (!deletedPlace) {
             return next(new Error(`Place could not be found`, 404))
         }
@@ -193,15 +189,15 @@ const deletePlaceById = async (req, res, next) => {
         if (deletedPlace.creator._id.toString() !== req.userData.userId) {
             // deletedPlace.creator --> WHO CREATED THIS PLACE
             // req.userData.userId --> WHO IS CURRENTLY LOGGED IN
-            return next(new HttpError(`You are not authorized to delete this place!`, 401))    
+            return next(new HttpError(`You are not authorized to delete this place!`, 401))
         }
 
     } catch (error) {
         return next(new HttpError(`Deleting Place failed: ${error.message}`, 500))
     }
- 
+
     // Removing place image from uploads/images dir upon deletion
-    // Save the path in this variable, after deletion, place.image will become undefined 
+    // Save the path in this variable, after deletion, place.image will become undefined
     const imagePath = deletedPlace.image
 
     try {
@@ -227,7 +223,7 @@ const deletePlaceById = async (req, res, next) => {
 
 exports.getPlaceById = getPlaceById
 exports.getPlacesByUserId = getPlacesByUserId
-exports.getPlacesByUserId2 = getPlacesByUserId2 
+exports.getPlacesByUserId2 = getPlacesByUserId2
 exports.createPlace = createPlace
 exports.updatePlaceById = updatePlaceById
-exports.deletePlaceById = deletePlaceById
+exports.deletePlaceById = deletePlaceById;

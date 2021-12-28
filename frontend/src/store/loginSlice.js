@@ -21,12 +21,10 @@ export const loginSlice = createSlice({
     }
 })
 
-
 export const { loginUser, logoutUser } = loginSlice.actions
 
 export const selectLogin = (state) => state.login.loggedIn
 export const selectId = (state) => state.login.user_id
 export const selectToken = (state) => state.login.token
 
-
-export default loginSlice.reducer
+export default loginSlice.reducer;

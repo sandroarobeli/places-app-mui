@@ -1,7 +1,5 @@
-// Third party modules
 const mongoose = require("mongoose");
 require("dotenv").config();
-
 
 // Establish connection to the database
 mongoose.connect(process.env.DB_URI, {

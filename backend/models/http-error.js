@@ -1,4 +1,4 @@
-// Creating custom Error class to standardize and avoid duplication 
+// Creating custom Error class to standardize and avoid duplication
 class HttpError extends Error {
     constructor(message, errorCode) {
         super(message) // Add a message property in addition to what it inherits
@@ -6,4 +6,4 @@ class HttpError extends Error {
     }
 }
 
-module.exports = HttpError
+module.exports = HttpError;

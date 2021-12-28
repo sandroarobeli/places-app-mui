@@ -1,10 +1,7 @@
-// Third party imports
 import React, { useState, useEffect } from "react";
 import { useSelector } from 'react-redux'
 import { useParams } from "react-router-dom";
 
-
-// Custom imports
 import PlaceList from "../components/PlaceList";
 import ErrorModal from '../../shared/components/UIElements/ErrorModal'
 import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner'
@@ -13,7 +10,7 @@ import { selectId } from '../../store/loginSlice'
 const UserPlaces = () => {
   // From redux
   const loggedUser = useSelector(selectId)
-  
+
   // Access to the dynamic segments
   const userId = useParams().userId;
   // State management
@@ -26,10 +23,10 @@ const UserPlaces = () => {
     const sendRequest = async () => {
       setIsLoading(true)
       try {
-        const response = await fetch(`http://127.0.0.1:5000/api/places/user/${userId}`)
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/places/user/${userId}`)
         const responseData = await response.json()
         if (!response.ok) {
-          throw new Error(responseData.message)    
+          throw new Error(responseData.message)
         }
         setIsLoading(false)
         setUserPlaces(responseData.places)
@@ -38,7 +35,7 @@ const UserPlaces = () => {
         setBackendError(error.message)
      }
     }
-    
+
     sendRequest()
   }, [userId])
 
@@ -48,12 +45,12 @@ const UserPlaces = () => {
     setOpenErrorModal(false)
     setBackendError('')
   }
-  
+
   // Triggers re rendering so the list no longer shows deleted place
   const placeDeleteHandler = (deletedPlaceId) => {
     setUserPlaces(prevState => prevState.filter((place) => place.id !== deletedPlaceId))
   }
-  
+
   return (
     <React.Fragment>
       {isLoading &&
@@ -72,10 +69,7 @@ const UserPlaces = () => {
         clearModal={handleErrorModalClose}
       />
     </React.Fragment>
-    
-    );
-  };
-  
-  export default UserPlaces;
-  
+  );
+};
 
+export default UserPlaces;

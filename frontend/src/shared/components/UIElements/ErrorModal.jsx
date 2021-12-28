@@ -1,4 +1,3 @@
-// Third party imports
 import React from 'react'
 import Button from '@mui/material/Button'
 import Dialog from '@mui/material/Dialog';
@@ -7,13 +6,7 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
 import Typography from '@mui/material/Typography'
 
-
-// Custom imports
-// None - This field intentionally left empty
-
-
 const ErrorModal = (props) => {
-    
   return (
     <React.Fragment>
       <Dialog
@@ -41,7 +34,7 @@ const ErrorModal = (props) => {
             },
             "& h2": {
               margin: {
-                tablet: "0.5rem" 
+                tablet: "0.5rem"
               }
             }
           }}
@@ -89,9 +82,7 @@ const ErrorModal = (props) => {
         </DialogActions>
       </Dialog>
     </React.Fragment>
-    );
+  );
 };
 
-
 export default ErrorModal;
-  
